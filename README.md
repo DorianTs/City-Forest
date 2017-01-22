@@ -13,5 +13,5 @@
 
 ##מסמכי הפרויקט
 - [רעיון הפרויקט](https://github.com/DorianTs/City-Forest/blob/master/Management%20and%20planning%20documents/%D7%A2%D7%99%D7%A8%20%D7%99%D7%A2%D7%A8%20%E2%80%93%20%D7%AA%D7%9E%D7%A6%D7%99%D7%AA%20%D7%94%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98.pdf)
-- [מסמך דרישות](https://github.com/DorianTs/City-Forest/blob/master/Management%20and%20planning%20documents/%D7%9E%D7%A1%D7%9E%D7%9A%20%D7%93%D7%A8%D7%99%D7%A9%D7%95%D7%AA.docx)
-- [הצעת הפרויקט](https://github.com/DorianTs/City-Forest/blob/master/Management%20and%20planning%20documents/%D7%94%D7%A6%D7%A2%D7%AA%20%D7%94%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98.docx)
+- [מסמך דרישות](https://github.com/DorianTs/City-Forest/blob/master/Management%20and%20planning%20documents/%D7%9E%D7%A1%D7%9E%D7%9A%20%D7%93%D7%A8%D7%99%D7%A9%D7%95%D7%AA.pdf)
+- [הצעת הפרויקט](https://github.com/DorianTs/City-Forest/blob/master/Management%20and%20planning%20documents/%D7%94%D7%A6%D7%A2%D7%AA%20%D7%A4%D7%A8%D7%95%D7%99%D7%A7%D7%98%20-%20%D7%A2%D7%99%D7%A8%20%D7%99%D7%A2%D7%A8%2C%20%D7%93%D7%95%D7%A8%D7%99%D7%90%D7%9F%20%D7%A6%D7%95%D7%A8%D7%A4%D7%99.pdf)
