@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "737790817079",
+    "firebase_url": "https://cityforest-38bad.firebaseio.com",
+    "project_id": "cityforest-38bad",
+    "storage_bucket": "cityforest-38bad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737790817079:android:e050622c041390fe",
+        "android_client_info": {
+          "package_name": "com.example.doriants.cityforest"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "737790817079-tp5j5uo9r5qooemhbkihgsqnob6l33ti.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.doriants.cityforest",
+            "certificate_hash": "f36eeed9bc0346f33bde17356983beb903f2b104"
+          }
+        },
+        {
+          "client_id": "737790817079-8k9ho6c8it2pi7vgl1h5rq3k2q48vpva.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATzrpcwPBCf-gq62OJh0DX5K5cvSs9D8A"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "737790817079-8k9ho6c8it2pi7vgl1h5rq3k2q48vpva.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
