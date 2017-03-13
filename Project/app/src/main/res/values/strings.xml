@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">CityForest</string>
+    <string name="cityforest_logo">CF logo</string>
+    <string name="access_token">pk.eyJ1IjoiZG9yaWFudHMiLCJhIjoiY2owODMzdm9kMDAxZTMyc2Jwam9rbGVxNSJ9.XYFTdmoxupXYITEOHS-HrA</string>
 </resources>

@@ -10,21 +10,40 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class CreateNewCoordinate extends AppCompatActivity {
 
     private static final String TAG = "db_on_change";
+    private static int cooID = 1;
+    private FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_new_coordinate);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
+        database = FirebaseDatabase.getInstance();
+        DatabaseReference coordinates = database.getReference("coordinates");
 
-        myRef.setValue("Hello, World!");
+        Map<String, Object> coordinatesMap = new HashMap<>();
 
-        myRef.addValueEventListener(new MyValueEventListener());
+
+        Coordinate co1 = new Coordinate(""+cooID, 31.7736, 35.1640, "end point", "bla");
+        Map<String, Object> coordinate = co1.toMap();
+        coordinatesMap.put(""+cooID, coordinate);
+        cooID++;
+
+        Coordinate co2 = new Coordinate(""+cooID, 34.4351, 23.9892, "תחנת יפה נוף", "תחנה מיוחדת");
+        Map<String, Object> coordinate2 = co2.toMap();
+        coordinatesMap.put(""+cooID, coordinate2);
+
+
+
+        coordinates.setValue(coordinatesMap);
+
+        coordinates.addValueEventListener(new MyValueEventListener());
     }
 
 
@@ -39,8 +58,7 @@ public class CreateNewCoordinate extends AppCompatActivity {
         public void onDataChange(DataSnapshot dataSnapshot) {
             // This method is called once with the initial value and again
             // whenever data at this location is updated.
-            String value = dataSnapshot.getValue(String.class);
-            Log.d(TAG, "Value is: " + value);
+
         }
     }
 }
