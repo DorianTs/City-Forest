@@ -1,9 +1,14 @@
 package com.example.doriants.cityforest;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -14,7 +19,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.services.commons.models.Position;
 
+import static com.example.doriants.cityforest.Constants.CHOSEN_COORDINATE;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
+import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 
 public class EditorPanelActivity extends AppCompatActivity {
 
@@ -29,13 +36,12 @@ public class EditorPanelActivity extends AppCompatActivity {
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new myOnMapReadyCallback());
-        mapView.setOnMapClickListener(new MyOnMapClickListener());
-        //mapView.setOnMapClickListener(new MyOnMapClickListener());
     }
 
     private class myOnMapReadyCallback implements OnMapReadyCallback {
         @Override
         public void onMapReady(MapboxMap mapboxMap) {
+            mapboxMap.setOnMapClickListener(new MyOnMapClickListener());
             mapboxMap.setStyleUrl(Style.OUTDOORS);
 
             /*Showing the default position to the editor*/
@@ -57,8 +63,42 @@ public class EditorPanelActivity extends AppCompatActivity {
     private class MyOnMapClickListener implements MapboxMap.OnMapClickListener{
         @Override
         public void onMapClick(@NonNull LatLng point) {
-
+            /*When clicking on a location in the map,
+            * we want to ask the editor if he wants to add a new coordinate
+            * in the database for this specific location*/
+            dialogAddNewCoordinate(point);
         }
+    }
+
+    private void dialogAddNewCoordinate(final LatLng point) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditorPanelActivity.this);
+        builder.setMessage(getResources().getString(R.string.dialog_add_new_coordinate));
+
+
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Intent i = new Intent(EditorPanelActivity.this, CreateNewCoordinate.class);
+                i.putExtra(CHOSEN_COORDINATE, castLatLngToJson(point));
+                startActivityForResult(i, NEW_COORDINATE);
+            }
+        });
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                return;
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    public String castLatLngToJson(LatLng point){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        String json = gson.toJson(point, LatLng.class);
+        return json;
     }
 
     @Override
