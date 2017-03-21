@@ -14,4 +14,9 @@ public final class Constants {
 
     public static final int NEW_COORDINATE = 100;
     public static final int COORDINATE_CREATED = 101;
+
+    public static boolean ADD_COORDINATE_MODE = false;
+    public static boolean DELETE_COORDINATE_MODE = false;
+    public static boolean EDIT_COORDINATE_MODE = false;
+    public static boolean ADD_TRACK_MODE = false;
 }

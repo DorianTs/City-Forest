@@ -3,9 +3,12 @@ package com.example.doriants.cityforest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -18,25 +21,37 @@ import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.services.commons.models.Position;
+import com.mapbox.services.geocoding.v5.GeocodingCriteria;
+import com.mapbox.services.geocoding.v5.models.CarmenFeature;
+import com.mapbox.services.android.geocoder.ui.GeocoderAutoCompleteView;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.doriants.cityforest.Constants.ADD_COORDINATE_MODE;
+import static com.example.doriants.cityforest.Constants.ADD_TRACK_MODE;
 import static com.example.doriants.cityforest.Constants.CHOSEN_COORDINATE;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
+import static com.example.doriants.cityforest.Constants.DELETE_COORDINATE_MODE;
+import static com.example.doriants.cityforest.Constants.EDIT_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 
 public class EditorPanelActivity extends AppCompatActivity {
 
     private MapView mapView;
+    private MapboxMap map;
     private FirebaseDatabase database;
     private DatabaseReference coordinates;
+    private Button add_coordinate_button;
+    private Button delete_coordinate_button;
+    private Button edit_coordinate_button;
+    private Button add_track_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,19 +65,110 @@ public class EditorPanelActivity extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         coordinates = database.getReference("coordinates");
+
+        add_coordinate_button = (Button)findViewById(R.id.addCoordinateButt);
+        delete_coordinate_button = (Button)findViewById(R.id.deleteCoordinateButt);
+        edit_coordinate_button = (Button)findViewById(R.id.editCoordinateButt);
+        add_track_button = (Button)findViewById(R.id.addTrackButt);
+
+        ClickListener clickListener = new ClickListener();
+        add_coordinate_button.setOnClickListener(clickListener);
+        delete_coordinate_button.setOnClickListener(clickListener);
+        edit_coordinate_button.setOnClickListener(clickListener);
+        add_track_button.setOnClickListener(clickListener);
+
+        ADD_COORDINATE_MODE = false;
+        DELETE_COORDINATE_MODE = false;
+        EDIT_COORDINATE_MODE = false;
+        ADD_TRACK_MODE = false;
+    }
+
+    private class ClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            if(v.getId() == add_coordinate_button.getId()) {
+                if(ADD_COORDINATE_MODE){
+                    ADD_COORDINATE_MODE = false;
+                    add_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+                else{
+                    ADD_COORDINATE_MODE = true;
+                    DELETE_COORDINATE_MODE = false;
+                    EDIT_COORDINATE_MODE = false;
+                    ADD_TRACK_MODE = false;
+
+                    add_coordinate_button.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    delete_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    edit_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    add_track_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+            }
+            if(v.getId() == delete_coordinate_button.getId()){
+                if(DELETE_COORDINATE_MODE){
+                    DELETE_COORDINATE_MODE = false;
+                    delete_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+                else{
+                    ADD_COORDINATE_MODE = false;
+                    DELETE_COORDINATE_MODE = true;
+                    EDIT_COORDINATE_MODE = false;
+                    ADD_TRACK_MODE = false;
+
+                    delete_coordinate_button.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    add_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    edit_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    add_track_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+            }
+            if(v.getId() == edit_coordinate_button.getId()){
+                if(EDIT_COORDINATE_MODE){
+                    EDIT_COORDINATE_MODE = false;
+                    edit_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+                else{
+                    ADD_COORDINATE_MODE = false;
+                    DELETE_COORDINATE_MODE = false;
+                    EDIT_COORDINATE_MODE = true;
+                    ADD_TRACK_MODE = false;
+
+                    edit_coordinate_button.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    add_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    delete_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    add_track_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+            }
+            if(v.getId() == add_track_button.getId()){
+                if(ADD_TRACK_MODE){
+                    ADD_TRACK_MODE = false;
+                    add_track_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+                else{
+                    ADD_COORDINATE_MODE = false;
+                    DELETE_COORDINATE_MODE = false;
+                    EDIT_COORDINATE_MODE = false;
+                    ADD_TRACK_MODE = true;
+
+                    add_track_button.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                    add_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    delete_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                    edit_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
+                }
+            }
+        }
     }
 
     private class myOnMapReadyCallback implements OnMapReadyCallback {
         @Override
         public void onMapReady(MapboxMap mapboxMap) {
-            mapboxMap.setOnMapClickListener(new MyOnMapClickListener());
-            mapboxMap.setStyleUrl(Style.OUTDOORS);
-            showDefaultLocation(mapboxMap);
-            showAllCoordinates(mapboxMap);
+            map = mapboxMap;
+            map.setOnMapClickListener(new MyOnMapClickListener());
+            map.setStyleUrl(Style.OUTDOORS);
+            showDefaultLocation();
+            showAllCoordinates();
         }
     }
 
-    private void showAllCoordinates(final MapboxMap mapboxMap) {
+    private void showAllCoordinates() {
         coordinates.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -84,9 +190,7 @@ public class EditorPanelActivity extends AppCompatActivity {
                             .position(latlng)
                             .title((String)cor.get("title"))
                             .snippet((String)cor.get("snippet"));
-
-
-                    mapboxMap.addMarker(markerViewOptions);
+                    map.addMarker(markerViewOptions);
                 }
             }
 
@@ -106,7 +210,7 @@ public class EditorPanelActivity extends AppCompatActivity {
         return obj;
     }
 
-    private void showDefaultLocation(MapboxMap mapboxMap){
+    private void showDefaultLocation(){
         /*Showing the default position to the editor*/
         double[] cameraPosValue = new double[5];
         cameraPosValue[0] = DEFAULT_JERUSALEM_COORDINATE.getLatitude();
@@ -117,16 +221,19 @@ public class EditorPanelActivity extends AppCompatActivity {
 
         CameraPosition.Builder cpBuilder = new CameraPosition.Builder(cameraPosValue);
         CameraPosition MountHerzlCameraPosition = cpBuilder.build();
-        mapboxMap.setCameraPosition(MountHerzlCameraPosition);
+        map.setCameraPosition(MountHerzlCameraPosition);
     }
 
     private class MyOnMapClickListener implements MapboxMap.OnMapClickListener{
         @Override
         public void onMapClick(@NonNull LatLng point) {
-            /*When clicking on a location in the map,
+            if(ADD_COORDINATE_MODE)
+                dialogAddNewCoordinate(point);
+            /*When clicking on a location (which is not a marker!) in the map while
+            * being in ADD_COORDINATE_MODE,
             * we want to ask the editor if he wants to add a new coordinate
             * in the database for this specific location*/
-            dialogAddNewCoordinate(point);
+
         }
     }
 

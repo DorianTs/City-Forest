@@ -11,5 +11,9 @@
     <string name="title_txt">Title</string>
     <string name="cancel_butt">Cancel</string>
     <string name="save_butt">Save</string>
+    <string name="add_coordinates_button">Add Coordinates</string>
+    <string name="add_track_button">Add Track</string>
+    <string name="delete_coordinates_button">Delete Coordinates</string>
+    <string name="edit_coordinates_button">Edit Coordinates</string>
     <!--End of dialogs -->
 </resources>

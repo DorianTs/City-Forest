@@ -1,39 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_new_dream"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.doriants.cityforest.EditorPanelActivity"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/mapLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             tools:ignore="UselessParent">
 
             <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/mapview"
                 android:layout_width="match_parent"
-                android:layout_height="400dp">
+                android:layout_height="match_parent">
 
                 <ImageView
-                    app:srcCompat="@drawable/cf_small_logo"
                     android:id="@+id/smallLogo"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:contentDescription="@string/cityforest_logo" />
+                    android:contentDescription="@string/cityforest_logo"
+                    app:srcCompat="@drawable/cf_small_logo" />
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:columnCount="2">
+
+                    <Button
+                        android:id="@+id/addCoordinateButt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:drawable/btn_default"
+                        android:text="@string/add_coordinates_button" />
+
+                    <Button
+                        android:id="@+id/deleteCoordinateButt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:drawable/btn_default"
+                        android:text="@string/delete_coordinates_button" />
+
+                    <Button
+                        android:id="@+id/editCoordinateButt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:drawable/btn_default"
+                        android:text="@string/edit_coordinates_button" />
+
+                    <Button
+                        android:id="@+id/addTrackButt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:drawable/btn_default"
+                        android:text="@string/add_track_button" />
+                </GridLayout>
 
             </com.mapbox.mapboxsdk.maps.MapView>
+
         </RelativeLayout>
-    </LinearLayout>
-
-
-</ScrollView>
+</LinearLayout>
