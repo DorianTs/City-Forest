@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class Coordinate {
 
-    private String id;
     private Position pos = null;
     private String title;
     private String snippet;
@@ -19,10 +18,9 @@ public class Coordinate {
     public Coordinate(){
     }
 
-    public Coordinate(String id, double coX, double coY,
+    public Coordinate(double coX, double coY,
                       String title, String snippet){
 
-        this.id = id;
         this.pos = Position.fromCoordinates(coY, coX);
         this.title = title;
         this.snippet = snippet;
@@ -31,7 +29,6 @@ public class Coordinate {
     /*building the JSON branch in the database that will include the coordinate*/
     public Map<String, Object> toMap(){
         HashMap<String, Object> result = new HashMap<>();
-        result.put("id", this.id);
         result.put("position", castPositionToJson());
         result.put("title", this.title);
         result.put("snippet", this.snippet);
@@ -40,9 +37,6 @@ public class Coordinate {
     }
 
     //=========================Getters & Setters=========================//
-    public String getId(){
-        return this.id;
-    }
     public Position getPos(){
         return this.pos;
     }

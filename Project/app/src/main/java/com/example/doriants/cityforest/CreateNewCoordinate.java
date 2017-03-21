@@ -31,10 +31,8 @@ import static com.example.doriants.cityforest.Constants.NEW_COORDINATE_ID;
 public class CreateNewCoordinate extends AppCompatActivity {
 
     private static final String TAG = "db_on_change";
-    private static long cooID;
     private FirebaseDatabase database;
     private DatabaseReference coordinates;
-    private DatabaseReference coordinate_id_ref;
     private LatLng chosenCoordinateLatLng;
     private EditText titleField;
     private EditText snippetField;
@@ -48,7 +46,6 @@ public class CreateNewCoordinate extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         coordinates = database.getReference("coordinates");
-        coordinate_id_ref = database.getReference("coordinate_id");
 
         coordinates.addValueEventListener(new MyValueEventListener());
 
@@ -60,26 +57,6 @@ public class CreateNewCoordinate extends AppCompatActivity {
         cancelButt = (Button)findViewById(R.id.cancelButt);
         saveButt.setOnClickListener(new MyClickListener());
         cancelButt.setOnClickListener(new MyClickListener());
-
-        /*Here we check if one of the editors started already
-        * to add coordinates, if yes, so we take the */
-        coordinate_id_ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Object result = dataSnapshot.getValue();
-                if(result == null){
-                    cooID = 1;
-                    coordinate_id_ref.setValue(cooID);
-                }
-                else{
-                    cooID = (long)result;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
     }
 
 
@@ -128,8 +105,9 @@ public class CreateNewCoordinate extends AppCompatActivity {
     /*Method writes to the Firebase db a new coordinate
     * with all the details*/
     private void writeNewCoordinate(){
+        String key = coordinates.push().getKey();
+
         Coordinate coordinate = new Coordinate(
-                ""+cooID,
                 chosenCoordinateLatLng.getLongitude(),
                 chosenCoordinateLatLng.getLatitude(),
                 titleField.getText().toString(),
@@ -138,8 +116,9 @@ public class CreateNewCoordinate extends AppCompatActivity {
         /*Converting our coordinate object to a map, that makes
         * the coordinate ready to be entered to the JSON tree*/
         Map<String, Object> coordinateMap = coordinate.toMap();
-        coordinates.child(""+cooID).setValue(coordinateMap);
-        cooID++;
-        coordinate_id_ref.setValue(cooID);
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(key, coordinateMap);
+        coordinates.updateChildren(childUpdates);
     }
 }
