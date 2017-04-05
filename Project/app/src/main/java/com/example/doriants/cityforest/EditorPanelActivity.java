@@ -43,6 +43,7 @@ import static com.example.doriants.cityforest.Constants.COORDINATE_KEY;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
 import static com.example.doriants.cityforest.Constants.DELETE_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.EDIT_COORDINATE_MODE;
+import static com.example.doriants.cityforest.Constants.MAX_NUM_OF_TRACK_COORDINATES;
 import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 
 public class EditorPanelActivity extends AppCompatActivity {
@@ -162,13 +163,19 @@ public class EditorPanelActivity extends AppCompatActivity {
                     ADD_TRACK_MODE = false;
                     add_track_button.setBackgroundResource(android.R.drawable.btn_default);
 
-                    /*TODO -
-                    build a function that passes on track_coordinates markers
+                    /*
+                    Passing on track_coordinates markers
                     * and change their color back to red.
-                    * And to clear both arrays for the next time building a new track*/
-
-
+                    * And clearing both arrays for the next time building a new track*/
+                    for(int i=0; i<track_markers.size(); i++){
+                        addMarkerForCoordinate(track_markers.get(i).getPosition(), track_markers.get(i).getTitle(),
+                                track_markers.get(i).getSnippet());
+                        map.removeMarker(track_markers.get(i));
+                    }
+                    track_coordinates.clear();
+                    track_markers.clear();
                     count_coordinates_selected = 0;
+
                     counter_coordinates.setVisibility(View.INVISIBLE);
                     save_track.setVisibility(View.INVISIBLE);
                     add_coordinate_button.setClickable(true);
@@ -278,7 +285,7 @@ public class EditorPanelActivity extends AppCompatActivity {
             * we want to ask the editor if he wants to add a new coordinate
             * in the database for this specific location*/
 
-            if(ADD_TRACK_MODE) {
+            if(ADD_TRACK_MODE && count_coordinates_selected < MAX_NUM_OF_TRACK_COORDINATES) {
                 writeGenericCoordinateToDB(point);
                 MarkerView marker = addMarkerForCoordinate(point, "", "");
                 IconFactory iconFactory = IconFactory.getInstance(EditorPanelActivity.this);
@@ -291,6 +298,9 @@ public class EditorPanelActivity extends AppCompatActivity {
                 track_markers.add(marker);
                 count_coordinates_selected++;
                 updateScreenCounter();
+            }
+            else if(ADD_TRACK_MODE && count_coordinates_selected >= MAX_NUM_OF_TRACK_COORDINATES){
+                Toast.makeText(EditorPanelActivity.this, R.string.reached_limit_of_coordinates, Toast.LENGTH_SHORT).show();
             }
 
         }
@@ -349,8 +359,29 @@ public class EditorPanelActivity extends AppCompatActivity {
                         updateScreenCounter();
                         addMarkerForCoordinate(marker.getPosition(), marker.getTitle(), marker.getSnippet());
                         map.removeMarker(marker);
+                        return true;
                     }
                 }
+
+                /*If we arrived this point, we know that the clicked marker wasn't chosen before,
+                * that's why we need to add him now to the track coordinates*/
+                if(count_coordinates_selected >= MAX_NUM_OF_TRACK_COORDINATES){
+                    Toast.makeText(EditorPanelActivity.this, R.string.reached_limit_of_coordinates, Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+                else{
+                    IconFactory iconFactory = IconFactory.getInstance(EditorPanelActivity.this);
+                    Icon icon = iconFactory.fromResource(R.drawable.blue_marker);
+
+                    track_coordinates.add(marker.getPosition().getLongitude());
+                    track_coordinates.add(marker.getPosition().getLatitude());
+                    track_markers.add(marker);
+                    count_coordinates_selected++;
+                    updateScreenCounter();
+                    marker.setIcon(icon);
+                    return true;
+                }
+
             }
             return false;
         }

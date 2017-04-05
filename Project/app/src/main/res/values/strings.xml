@@ -20,5 +20,6 @@
     <string name="edit_coordinates_button">Edit Coordinates</string>
     <string name="update_butt">Update</string>
     <string name="coordinates_selected_txt">Coordinates selected: </string>
+    <string name="reached_limit_of_coordinates">You have reached the limit of selected coordinates to build a track.</string>
     <!--End of dialogs -->
 </resources>
