@@ -10,26 +10,42 @@
     android:orientation="vertical">
 
 
-
-        <RelativeLayout
+    <RelativeLayout
             android:id="@+id/mapLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:ignore="UselessParent">
 
-            <com.mapbox.mapboxsdk.maps.MapView
+        <com.mapbox.mapboxsdk.maps.MapView
                 android:id="@+id/mapview"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true">
 
-                <ImageView
+            <ImageView
                     android:id="@+id/smallLogo"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:contentDescription="@string/cityforest_logo"
                     app:srcCompat="@drawable/cf_small_logo" />
 
-                <GridLayout
+            <TextView
+                android:id="@+id/counterCoordinates"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/saveTrack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="25dp"
+                android:text="Finish Editing Track" />
+
+            <GridLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
@@ -64,7 +80,7 @@
                         android:text="@string/add_track_button" />
                 </GridLayout>
 
-            </com.mapbox.mapboxsdk.maps.MapView>
+        </com.mapbox.mapboxsdk.maps.MapView>
 
         </RelativeLayout>
 </LinearLayout>

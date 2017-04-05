@@ -11,6 +11,7 @@ public final class Constants {
     public static final String CHOSEN_COORDINATE = "Chosen Coordinate";
     public static final String NEW_COORDINATE_ID = "Coordinate ID";
     public static final String IS_COORDINATE_MAP_CREATED = "Is coordinate map created";
+    public static final String COORDINATE_KEY = "Coordinate key";
 
     public static final int NEW_COORDINATE = 100;
     public static final int COORDINATE_CREATED = 101;
@@ -19,4 +20,5 @@ public final class Constants {
     public static boolean DELETE_COORDINATE_MODE = false;
     public static boolean EDIT_COORDINATE_MODE = false;
     public static boolean ADD_TRACK_MODE = false;
+
 }

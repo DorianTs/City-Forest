@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,8 +47,6 @@ public class CreateNewCoordinate extends AppCompatActivity {
 
         database = FirebaseDatabase.getInstance();
         coordinates = database.getReference("coordinates");
-
-        coordinates.addValueEventListener(new MyValueEventListener());
 
         Intent i = getIntent();
         chosenCoordinateLatLng = retreiveLatLngFromJson(i.getStringExtra(CHOSEN_COORDINATE));
@@ -87,25 +86,12 @@ public class CreateNewCoordinate extends AppCompatActivity {
     }
 
 
-    private class MyValueEventListener implements ValueEventListener{
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            // Failed to read value
-            Log.w(TAG, "Failed to read value.", databaseError.toException());
-        }
 
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            // This method is called once with the initial value and again
-            // whenever data at this location is updated.
-
-        }
-    }
 
     /*Method writes to the Firebase db a new coordinate
     * with all the details*/
     private void writeNewCoordinate(){
-        String key = coordinates.push().getKey();
+        String key = hashFunction();
 
         Coordinate coordinate = new Coordinate(
                 chosenCoordinateLatLng.getLongitude(),
@@ -120,5 +106,15 @@ public class CreateNewCoordinate extends AppCompatActivity {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(key, coordinateMap);
         coordinates.updateChildren(childUpdates);
+    }
+
+
+    private String hashFunction() {
+        double longitude = chosenCoordinateLatLng.getLongitude();
+        //double latitude = chosenCoordinateLatLng.getLatitude();
+
+
+        int hash = (int) (10000000*longitude);
+        return "" + hash;
     }
 }

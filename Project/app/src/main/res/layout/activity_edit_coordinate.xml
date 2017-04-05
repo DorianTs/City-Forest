@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_create_new_coordinate"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.doriants.cityforest.CreateNewCoordinate"
+    android:orientation="vertical">
+
+    <TextView
+        android:text="@string/title_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/titleTxt" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/titleField"
+        tools:ignore="LabelFor" />
+
+    <TextView
+        android:text="@string/summary_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/summaryTxt"
+        android:layout_marginTop="20dp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:ems="10"
+        android:id="@+id/SummaryField"
+        tools:ignore="LabelFor" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/updateButt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/update_butt"
+            tools:ignore="ButtonStyle" />
+
+        <Button
+            android:text="@string/cancel_butt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/cancelButt"
+            android:layout_weight="1"
+            tools:ignore="ButtonOrder,ButtonStyle" />
+    </LinearLayout>
+</LinearLayout>

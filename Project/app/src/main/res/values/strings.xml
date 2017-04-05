@@ -7,6 +7,9 @@
     <string name="dialog_add_new_coordinate">Add new coordinate in this location?</string>
     <string name="dialog_ok">Ok</string>
     <string name="dialog_cancel">Cancel</string>
+    <string name="dialog_delete_coordinate">Delete this coordinate?</string>
+    <string name="dialog_edit_coordinate">Edit this coordinate info?</string>
+
     <string name="summary_txt">Summary</string>
     <string name="title_txt">Title</string>
     <string name="cancel_butt">Cancel</string>
@@ -15,5 +18,7 @@
     <string name="add_track_button">Add Track</string>
     <string name="delete_coordinates_button">Delete Coordinates</string>
     <string name="edit_coordinates_button">Edit Coordinates</string>
+    <string name="update_butt">Update</string>
+    <string name="coordinates_selected_txt">Coordinates selected: </string>
     <!--End of dialogs -->
 </resources>
