@@ -3,6 +3,7 @@ package com.example.doriants.cityforest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,17 +25,31 @@ import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerView;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
+import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.services.commons.ServicesException;
+import com.mapbox.services.commons.geojson.LineString;
 import com.mapbox.services.commons.models.Position;
+import com.mapbox.services.directions.v5.DirectionsCriteria;
+import com.mapbox.services.directions.v5.MapboxDirections;
+import com.mapbox.services.directions.v5.models.DirectionsResponse;
+import com.mapbox.services.directions.v5.models.DirectionsRoute;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.example.doriants.cityforest.Constants.ADD_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.ADD_TRACK_MODE;
@@ -43,6 +58,7 @@ import static com.example.doriants.cityforest.Constants.COORDINATE_KEY;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
 import static com.example.doriants.cityforest.Constants.DELETE_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.EDIT_COORDINATE_MODE;
+import static com.example.doriants.cityforest.Constants.FINISH_EDIT_TRACK_MODE;
 import static com.example.doriants.cityforest.Constants.MAX_NUM_OF_TRACK_COORDINATES;
 import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 
@@ -50,13 +66,17 @@ public class EditorPanelActivity extends AppCompatActivity {
 
     private MapView mapView;
     private MapboxMap map;
+    private DirectionsRoute currentRoute;
+    private PolylineOptions routeLine;
     private FirebaseDatabase database;
     private DatabaseReference coordinates;
     private Button add_coordinate_button;
     private Button delete_coordinate_button;
     private Button edit_coordinate_button;
     private Button add_track_button;
+    private Button finish_edit_track_butt;
     private Button save_track;
+    private Button continue_editing;
     private TextView counter_coordinates;
 
     /*Count how many coordinates selected for creating a track (max of 25 coordinates)*/
@@ -84,7 +104,9 @@ public class EditorPanelActivity extends AppCompatActivity {
         delete_coordinate_button = (Button)findViewById(R.id.deleteCoordinateButt);
         edit_coordinate_button = (Button)findViewById(R.id.editCoordinateButt);
         add_track_button = (Button)findViewById(R.id.addTrackButt);
+        finish_edit_track_butt = (Button)findViewById(R.id.finishEditTrack);
         save_track = (Button)findViewById(R.id.saveTrack);
+        continue_editing = (Button)findViewById(R.id.continueEditTrack);
         counter_coordinates = (TextView)findViewById(R.id.counterCoordinates);
 
         ClickListener clickListener = new ClickListener();
@@ -92,15 +114,20 @@ public class EditorPanelActivity extends AppCompatActivity {
         delete_coordinate_button.setOnClickListener(clickListener);
         edit_coordinate_button.setOnClickListener(clickListener);
         add_track_button.setOnClickListener(clickListener);
+        finish_edit_track_butt.setOnClickListener(clickListener);
         save_track.setOnClickListener(clickListener);
+        continue_editing.setOnClickListener(clickListener);
 
         ADD_COORDINATE_MODE = false;
         DELETE_COORDINATE_MODE = false;
         EDIT_COORDINATE_MODE = false;
         ADD_TRACK_MODE = false;
+        FINISH_EDIT_TRACK_MODE = false;
 
         counter_coordinates.setVisibility(View.INVISIBLE);
+        finish_edit_track_butt.setVisibility(View.INVISIBLE);
         save_track.setVisibility(View.INVISIBLE);
+        continue_editing.setVisibility(View.INVISIBLE);
     }
 
     private class ClickListener implements View.OnClickListener{
@@ -161,6 +188,7 @@ public class EditorPanelActivity extends AppCompatActivity {
             if(v.getId() == add_track_button.getId()){
                 if(ADD_TRACK_MODE){
                     ADD_TRACK_MODE = false;
+                    add_track_button.setText(R.string.add_track_button);
                     add_track_button.setBackgroundResource(android.R.drawable.btn_default);
 
                     /*
@@ -177,7 +205,10 @@ public class EditorPanelActivity extends AppCompatActivity {
                     count_coordinates_selected = 0;
 
                     counter_coordinates.setVisibility(View.INVISIBLE);
+                    finish_edit_track_butt.setVisibility(View.INVISIBLE);
                     save_track.setVisibility(View.INVISIBLE);
+                    continue_editing.setVisibility(View.INVISIBLE);
+
                     add_coordinate_button.setClickable(true);
                     delete_coordinate_button.setClickable(true);
                     edit_coordinate_button.setClickable(true);
@@ -188,6 +219,7 @@ public class EditorPanelActivity extends AppCompatActivity {
                     EDIT_COORDINATE_MODE = false;
                     ADD_TRACK_MODE = true;
 
+                    add_track_button.setText(R.string.cancel_add_track_butt);
                     add_track_button.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                     add_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
                     delete_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
@@ -195,11 +227,67 @@ public class EditorPanelActivity extends AppCompatActivity {
 
                     updateScreenCounter();
                     counter_coordinates.setVisibility(View.VISIBLE);
-                    save_track.setVisibility(View.VISIBLE);
+                    finish_edit_track_butt.setVisibility(View.VISIBLE);
                     add_coordinate_button.setClickable(false);
                     delete_coordinate_button.setClickable(false);
                     edit_coordinate_button.setClickable(false);
                 }
+            }
+            /*If editor clicked this button, we need to show him the resulted track by creating
+            * the route object and save it as the class's property*/
+            if(v.getId() == finish_edit_track_butt.getId()){
+                if(track_markers.size() < 2){
+                    Toast.makeText(EditorPanelActivity.this, R.string.not_enough_coordinates_selected, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //here we turn off ADD_TRACK_MODE
+                ADD_TRACK_MODE = false;
+                add_track_button.setClickable(false);
+                FINISH_EDIT_TRACK_MODE = true;
+                finish_edit_track_butt.setVisibility(View.INVISIBLE);
+                save_track.setVisibility(View.VISIBLE);
+                continue_editing.setVisibility(View.VISIBLE);
+
+                /*TODO
+                * take the array list and convert it to double array
+                * calculate the route
+                * display the route on the map*/
+
+
+                Object[] temp = track_coordinates.toArray();
+                double[] coordinates = new double[track_coordinates.size()-2];
+                double[] last_coordinate = new double[2];
+                for(int i=0; i<track_coordinates.size()-2; i++){
+                    coordinates[i] = (double)temp[i];
+                }
+                last_coordinate[0] = (double)temp[track_coordinates.size()-2];
+                last_coordinate[1] = (double)temp[track_coordinates.size()-1];
+
+                try {
+                    getRoute(Position.fromCoordinates(coordinates), Position.fromCoordinates(last_coordinate));
+                } catch (ServicesException servicesException) {
+                    servicesException.printStackTrace();
+                }
+
+                LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                        .include(track_markers.get(0).getPosition())
+                        .include(track_markers.get(track_markers.size()-1).getPosition())
+                        .build();
+
+                map.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 100);
+            }
+            if(v.getId() == continue_editing.getId()){
+                //here we turn on ADD_TRACK_MODE
+                ADD_TRACK_MODE = true;
+                add_track_button.setClickable(true);
+                save_track.setVisibility(View.INVISIBLE);
+                continue_editing.setVisibility(View.INVISIBLE);
+                finish_edit_track_butt.setVisibility(View.VISIBLE);
+
+                /*TODO
+                * erase the route from the map*/
+                map.removePolyline(routeLine.getPolyline());
             }
         }
     }
@@ -247,6 +335,64 @@ public class EditorPanelActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {}
 
         });
+
+    }
+
+    private void getRoute(Position origin, Position destination) throws ServicesException {
+        MapboxDirections client = new MapboxDirections.Builder()
+                .setOrigin(origin)
+                .setDestination(destination)
+                .setProfile(DirectionsCriteria.PROFILE_WALKING)
+                .setAccessToken(MapboxAccountManager.getInstance().getAccessToken())
+                .build();
+
+        client.enqueueCall(new Callback<DirectionsResponse>() {
+            @Override
+            public void onResponse(Call<DirectionsResponse> call, Response<DirectionsResponse> response) {
+                // You can get the generic HTTP info about the response
+
+                if (response.body() == null) {
+                    return;
+                } else if (response.body().getRoutes().size() < 1) {
+                    return;
+                }
+
+                // Print some info about the route
+                currentRoute = response.body().getRoutes().get(0);
+                Toast.makeText(
+                        EditorPanelActivity.this,
+                        "Route is " + currentRoute.getDistance() + " meters long.",
+                        Toast.LENGTH_SHORT).show();
+
+                // Draw the route on the map
+                drawRoute(currentRoute);
+            }
+
+            @Override
+            public void onFailure(Call<DirectionsResponse> call, Throwable throwable) {
+                Toast.makeText(EditorPanelActivity.this, "Error: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void drawRoute(DirectionsRoute route) {
+        // Convert LineString coordinates into LatLng[]
+        LineString lineString = LineString.fromPolyline(route.getGeometry(), com.mapbox.services.Constants.OSRM_PRECISION_V5);
+        List<Position> coordinates = lineString.getCoordinates();
+        LatLng[] points = new LatLng[coordinates.size()];
+        for (int i = 0; i < coordinates.size(); i++) {
+            points[i] = new LatLng(
+                    coordinates.get(i).getLatitude(),
+                    coordinates.get(i).getLongitude());
+        }
+
+        // Draw Points on MapView
+        routeLine = new PolylineOptions()
+                .add(points)
+                .color(Color.RED)
+                .width(6);
+        map.addPolyline(routeLine);
 
     }
 

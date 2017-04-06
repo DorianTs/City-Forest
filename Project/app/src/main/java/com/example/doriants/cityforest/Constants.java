@@ -21,5 +21,6 @@ public final class Constants {
     public static boolean DELETE_COORDINATE_MODE = false;
     public static boolean EDIT_COORDINATE_MODE = false;
     public static boolean ADD_TRACK_MODE = false;
+    public static boolean FINISH_EDIT_TRACK_MODE = false;
 
 }

@@ -38,12 +38,30 @@
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/saveTrack"
+                android:id="@+id/finishEditTrack"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="25dp"
                 android:text="Finish Editing Track" />
+
+            <Button
+                android:id="@+id/saveTrack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginRight="60dp"
+                android:layout_marginTop="25dp"
+                android:text="Save Track" />
+
+            <Button
+                android:id="@+id/continueEditTrack"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="60dp"
+                android:layout_marginTop="25dp"
+                android:text="Continue Edit" />
 
             <GridLayout
                     android:layout_width="match_parent"

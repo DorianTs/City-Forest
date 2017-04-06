@@ -16,10 +16,12 @@
     <string name="save_butt">Save</string>
     <string name="add_coordinates_button">Add Coordinates</string>
     <string name="add_track_button">Add Track</string>
+    <string name="cancel_add_track_butt">Cancel adding track</string>
     <string name="delete_coordinates_button">Delete Coordinates</string>
     <string name="edit_coordinates_button">Edit Coordinates</string>
     <string name="update_butt">Update</string>
     <string name="coordinates_selected_txt">Coordinates selected: </string>
     <string name="reached_limit_of_coordinates">You have reached the limit of selected coordinates to build a track.</string>
+    <string name="not_enough_coordinates_selected">Track can be calculated with at least 2 coordinates</string>
     <!--End of dialogs -->
 </resources>
