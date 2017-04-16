@@ -285,8 +285,7 @@ public class EditorPanelActivity extends AppCompatActivity {
                 continue_editing.setVisibility(View.INVISIBLE);
                 finish_edit_track_butt.setVisibility(View.VISIBLE);
 
-                /*TODO
-                * erase the route from the map*/
+
                 map.removePolyline(routeLine.getPolyline());
             }
         }
