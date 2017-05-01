@@ -83,6 +83,7 @@ public class EditorPanelActivity extends AppCompatActivity {
     private int count_coordinates_selected = 0;
     private ArrayList<Double> track_coordinates = new ArrayList<>();
     private ArrayList<Marker> track_markers = new ArrayList<>();
+    private ArrayList<Position> track_positions = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,6 +203,7 @@ public class EditorPanelActivity extends AppCompatActivity {
                     }
                     track_coordinates.clear();
                     track_markers.clear();
+                    track_positions.clear();
                     count_coordinates_selected = 0;
 
                     counter_coordinates.setVisibility(View.INVISIBLE);
@@ -249,23 +251,8 @@ public class EditorPanelActivity extends AppCompatActivity {
                 save_track.setVisibility(View.VISIBLE);
                 continue_editing.setVisibility(View.VISIBLE);
 
-                /*TODO
-                * take the array list and convert it to double array
-                * calculate the route
-                * display the route on the map*/
-
-
-                Object[] temp = track_coordinates.toArray();
-                double[] coordinates = new double[track_coordinates.size()-2];
-                double[] last_coordinate = new double[2];
-                for(int i=0; i<track_coordinates.size()-2; i++){
-                    coordinates[i] = (double)temp[i];
-                }
-                last_coordinate[0] = (double)temp[track_coordinates.size()-2];
-                last_coordinate[1] = (double)temp[track_coordinates.size()-1];
-
                 try {
-                    getRoute(Position.fromCoordinates(coordinates), Position.fromCoordinates(last_coordinate));
+                    getRoute();
                 } catch (ServicesException servicesException) {
                     servicesException.printStackTrace();
                 }
@@ -337,10 +324,9 @@ public class EditorPanelActivity extends AppCompatActivity {
 
     }
 
-    private void getRoute(Position origin, Position destination) throws ServicesException {
+    private void getRoute() throws ServicesException {
         MapboxDirections client = new MapboxDirections.Builder()
-                .setOrigin(origin)
-                .setDestination(destination)
+                .setCoordinates(track_positions)
                 .setProfile(DirectionsCriteria.PROFILE_WALKING)
                 .setAccessToken(MapboxAccountManager.getInstance().getAccessToken())
                 .build();
@@ -416,8 +402,8 @@ public class EditorPanelActivity extends AppCompatActivity {
         cameraPosValue[4] = 10;
 
         CameraPosition.Builder cpBuilder = new CameraPosition.Builder(cameraPosValue);
-        CameraPosition MountHerzlCameraPosition = cpBuilder.build();
-        map.setCameraPosition(MountHerzlCameraPosition);
+        CameraPosition tempPos = cpBuilder.build();
+        map.setCameraPosition(tempPos);
     }
 
     private class MyOnMapClickListener implements MapboxMap.OnMapClickListener{
@@ -441,6 +427,8 @@ public class EditorPanelActivity extends AppCompatActivity {
                 track_coordinates.add(point.getLongitude());
                 track_coordinates.add(point.getLatitude());
                 track_markers.add(marker);
+                Position temp = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
+                track_positions.add(temp);
                 count_coordinates_selected++;
                 updateScreenCounter();
             }
@@ -500,6 +488,8 @@ public class EditorPanelActivity extends AppCompatActivity {
                         track_coordinates.remove(marker.getPosition().getLongitude());
                         track_coordinates.remove(marker.getPosition().getLatitude());
                         track_markers.remove(marker);
+                        Position temp = Position.fromCoordinates(marker.getPosition().getLongitude(), marker.getPosition().getLatitude());
+                        track_positions.remove(temp);
                         count_coordinates_selected--;
                         updateScreenCounter();
                         addMarkerForCoordinate(marker.getPosition(), marker.getTitle(), marker.getSnippet());
@@ -521,6 +511,8 @@ public class EditorPanelActivity extends AppCompatActivity {
                     track_coordinates.add(marker.getPosition().getLongitude());
                     track_coordinates.add(marker.getPosition().getLatitude());
                     track_markers.add(marker);
+                    Position temp = Position.fromCoordinates(marker.getPosition().getLongitude(), marker.getPosition().getLatitude());
+                    track_positions.add(temp);
                     count_coordinates_selected++;
                     updateScreenCounter();
                     marker.setIcon(icon);
