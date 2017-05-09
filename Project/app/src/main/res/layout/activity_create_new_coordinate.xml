@@ -54,11 +54,12 @@
             tools:ignore="ButtonStyle" />
 
         <Button
-            android:text="@string/cancel_butt"
+            android:id="@+id/cancelButt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/cancelButt"
+            android:layout_marginLeft="5dp"
             android:layout_weight="1"
-            tools:ignore="ButtonOrder,ButtonStyle" />
+            android:text="@string/cancel_butt"
+            tools:ignore="ButtonOrder,ButtonStyle,RtlHardcoded" />
     </LinearLayout>
 </LinearLayout>

@@ -54,6 +54,7 @@ import retrofit2.Response;
 import static com.example.doriants.cityforest.Constants.ADD_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.ADD_TRACK_MODE;
 import static com.example.doriants.cityforest.Constants.CHOSEN_COORDINATE;
+import static com.example.doriants.cityforest.Constants.CHOSEN_TRACK;
 import static com.example.doriants.cityforest.Constants.COORDINATE_KEY;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
 import static com.example.doriants.cityforest.Constants.DELETE_COORDINATE_MODE;
@@ -61,6 +62,7 @@ import static com.example.doriants.cityforest.Constants.EDIT_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.FINISH_EDIT_TRACK_MODE;
 import static com.example.doriants.cityforest.Constants.MAX_NUM_OF_TRACK_COORDINATES;
 import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
+import static com.example.doriants.cityforest.Constants.NEW_TRACK;
 
 public class EditorPanelActivity extends AppCompatActivity {
 
@@ -275,6 +277,11 @@ public class EditorPanelActivity extends AppCompatActivity {
 
                 map.removePolyline(routeLine.getPolyline());
             }
+            if(v.getId() == save_track.getId()){
+                Intent i = new Intent(EditorPanelActivity.this, CreateNewTrack.class);
+                i.putExtra(CHOSEN_TRACK, castRouteToJson(currentRoute));
+                startActivityForResult(i, NEW_TRACK);
+            }
         }
     }
 
@@ -347,7 +354,7 @@ public class EditorPanelActivity extends AppCompatActivity {
                 Toast.makeText(
                         EditorPanelActivity.this,
                         "Route is " + currentRoute.getDistance() + " meters long.",
-                        Toast.LENGTH_SHORT).show();
+                        Toast.LENGTH_LONG).show();
 
                 // Draw the route on the map
                 drawRoute(currentRoute);
@@ -627,6 +634,16 @@ public class EditorPanelActivity extends AppCompatActivity {
 
         Gson gson = gsonBuilder.create();
         String json = gson.toJson(point, LatLng.class);
+        return json;
+    }
+
+    /*Method casts LatLng object to Json, to be able to send it via intent*/
+    public String castRouteToJson(DirectionsRoute route){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        String json = gson.toJson(route, DirectionsRoute.class);
         return json;
     }
 

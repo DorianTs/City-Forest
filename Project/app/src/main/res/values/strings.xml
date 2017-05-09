@@ -9,6 +9,8 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_delete_coordinate">Delete this coordinate?</string>
     <string name="dialog_edit_coordinate">Edit this coordinate info?</string>
+    <!--End of dialogs -->
+
 
     <string name="summary_txt">Summary</string>
     <string name="title_txt">Title</string>
@@ -23,5 +25,60 @@
     <string name="coordinates_selected_txt">Coordinates selected: </string>
     <string name="reached_limit_of_coordinates">You have reached the limit of selected coordinates to build a track.</string>
     <string name="not_enough_coordinates_selected">Track can be calculated with at least 2 coordinates</string>
-    <!--End of dialogs -->
+    <string name="distance_km_txt">Distance (km)</string>
+    <string name="duration_hour_txt">Duration (hour)</string>
+    <string name="ending_point_txt">Ending Point</string>
+    <string name="has_water_txt">Has water?</string>
+    <string name="is_romantic_txt">Is Romantic?</string>
+    <string name="season_txt">Season</string>
+    <string name="starting_point_txt">Starting Point</string>
+    <string name="suitable_for_bikes_txt">Suitable For Bikes?</string>
+    <string name="suitable_for_dogs_txt">Suitable For Dogs?</string>
+    <string name="suitable_for_families_txt">Suitable For Families?</string>
+    <string name="track_level_txt">Track Level</string>
+    <string name="track_name_txt">Track Name</string>
+    <string name="track_summary_txt">Track Summary</string>
+    <string name="choose_a_station">Choose a station</string>
+    <string name="choose_station_empty">Please choose starting and ending train stations</string>
+
+    <string-array name="train_stations">
+        <item>Choose a station</item>
+        <item>הר הרצל</item>
+        <item>יפה נוף</item>
+        <item>כיכר דניה</item>
+        <item>החלוץ</item>
+        <item>קרית משה</item>
+        <item>התחנה המרכזית</item>
+        <item>הטורים</item>
+        <item>מחנה יהודה</item>
+        <item>הדוידקה</item>
+        <item>יפו מרכז</item>
+        <item>העירייה</item>
+        <item>שער שכם</item>
+        <item>שבטי ישראל</item>
+        <item>שמעון הצדיק</item>
+        <item>גבעת התחמושת</item>
+        <item>גבעת המיבתר</item>
+        <item>א-סהל</item>
+        <item>שועפאט</item>
+        <item>בית חנינא</item>
+        <item>פסגת זאב מרכז</item>
+        <item>סיירת דוכיפת</item>
+        <item>חיל האוויר</item>
+    </string-array>
+
+    <string-array name="track_level">
+        <item>Choose track level</item>
+        <item>קל</item>
+        <item>בינוני</item>
+        <item>מיטיבי לכת</item>
+    </string-array>
+
+    <string-array name="season">
+        <item>כל השנה</item>
+        <item>קיץ</item>
+        <item>חורף</item>
+        <item>סתיו</item>
+        <item>אביב</item>
+    </string-array>
 </resources>
