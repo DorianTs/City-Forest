@@ -17,7 +17,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mapbox.services.directions.v5.models.DirectionsRoute;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.example.doriants.cityforest.Constants.CHOSEN_TRACK;
+import static com.example.doriants.cityforest.Constants.TRACK_CREATED;
 
 
 public class CreateNewTrack extends AppCompatActivity {
@@ -88,6 +92,16 @@ public class CreateNewTrack extends AppCompatActivity {
         public void onClick(View v) {
             if(v.getId() == save_button.getId()){
                 boolean canSave = checkFields();
+                if(canSave){
+                    writeNewTrack();
+
+                    Intent i = new Intent(CreateNewTrack.this, EditorPanelActivity.class);
+                    setResult(TRACK_CREATED);
+                    startActivity(i);
+                }
+            }
+            if(v.getId() == cancel_button.getId()){
+                onBackPressed();
             }
         }
     }
@@ -99,7 +113,15 @@ public class CreateNewTrack extends AppCompatActivity {
             return false;
         }
 
-        //TODO - check all field that have to be filled
+        if(distance_field.getText().toString().equals("")){
+            Toast.makeText(this, R.string.choose_distance_empty, Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if(track_level.getSelectedItem().toString().equals(getResources().getString(R.string.choose_a_level))){
+            Toast.makeText(this, R.string.choose_level_empty, Toast.LENGTH_LONG).show();
+            return false;
+        }
 
         return true;
     }
@@ -121,5 +143,37 @@ public class CreateNewTrack extends AppCompatActivity {
         Gson gson = gsonBuilder.create();
         DirectionsRoute obj = gson.fromJson(stringExtra, DirectionsRoute.class);
         return obj;
+    }
+
+    private void writeNewTrack(){
+
+        String key = tracks.push().getKey();
+
+        double duration = Double.parseDouble(duration_field.getText().toString());
+        double distance = Double.parseDouble(distance_field.getText().toString());
+
+        Track track = new Track(
+                current_route,
+                track_name_field.getText().toString(),
+                starting_point.getSelectedItem().toString(),
+                ending_point.getSelectedItem().toString(),
+                duration,
+                distance,
+                track_level.getSelectedItem().toString(),
+                season.getSelectedItem().toString(),
+                has_water.isChecked(),
+                suitable_for_bikes.isChecked(),
+                suitable_for_dogs.isChecked(),
+                suitable_for_families.isChecked(),
+                is_romantic.isChecked(),
+                additional_info.getText().toString());
+
+        /*Converting our track object to a map, that makes
+        * the track ready to be entered to the JSON tree*/
+        Map<String, Object> trackMap = track.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(key, trackMap);
+        tracks.updateChildren(childUpdates);
     }
 }

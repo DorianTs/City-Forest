@@ -79,6 +79,7 @@ public class EditorPanelActivity extends AppCompatActivity {
     private Button finish_edit_track_butt;
     private Button save_track;
     private Button continue_editing;
+    private Button edit_tracks_button;
     private TextView counter_coordinates;
 
     /*Count how many coordinates selected for creating a track (max of 25 coordinates)*/
@@ -106,6 +107,7 @@ public class EditorPanelActivity extends AppCompatActivity {
         add_coordinate_button = (Button)findViewById(R.id.addCoordinateButt);
         delete_coordinate_button = (Button)findViewById(R.id.deleteCoordinateButt);
         edit_coordinate_button = (Button)findViewById(R.id.editCoordinateButt);
+        edit_tracks_button = (Button)findViewById(R.id.editTrackButton);
         add_track_button = (Button)findViewById(R.id.addTrackButt);
         finish_edit_track_butt = (Button)findViewById(R.id.finishEditTrack);
         save_track = (Button)findViewById(R.id.saveTrack);
@@ -120,6 +122,7 @@ public class EditorPanelActivity extends AppCompatActivity {
         finish_edit_track_butt.setOnClickListener(clickListener);
         save_track.setOnClickListener(clickListener);
         continue_editing.setOnClickListener(clickListener);
+        edit_tracks_button.setOnClickListener(clickListener);
 
         ADD_COORDINATE_MODE = false;
         DELETE_COORDINATE_MODE = false;
@@ -281,6 +284,10 @@ public class EditorPanelActivity extends AppCompatActivity {
                 Intent i = new Intent(EditorPanelActivity.this, CreateNewTrack.class);
                 i.putExtra(CHOSEN_TRACK, castRouteToJson(currentRoute));
                 startActivityForResult(i, NEW_TRACK);
+            }
+            if(v.getId() == edit_tracks_button.getId()){
+                Intent i = new Intent(EditorPanelActivity.this, EditTracksActivity.class);
+                startActivity(i);
             }
         }
     }

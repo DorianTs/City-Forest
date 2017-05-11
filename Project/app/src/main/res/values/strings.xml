@@ -39,7 +39,17 @@
     <string name="track_name_txt">Track Name</string>
     <string name="track_summary_txt">Track Summary</string>
     <string name="choose_a_station">Choose a station</string>
+    <string name="choose_a_level">Choose track level</string>
     <string name="choose_station_empty">Please choose starting and ending train stations</string>
+    <string name="choose_distance_empty">Please add the distance of this track</string>
+    <string name="choose_level_empty">Please choose the level of this track</string>
+    <string name="continue_edit_butt">Continue Edit</string>
+    <string name="finish_editing_track_butt">Finish Editing Track</string>
+    <string name="save_track_butt">Save Track</string>
+    <string name="track_level">רמת קושי</string>
+    <string name="strating_point_txt">התחלה -</string>
+    <string name="distance_txt">מרחק</string>
+    <string name="ending_point_txt_heb">סיום -</string>
 
     <string-array name="train_stations">
         <item>Choose a station</item>
