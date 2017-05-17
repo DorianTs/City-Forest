@@ -30,7 +30,8 @@
             android:name=".EditCoordinate"
             android:label="Edit Coordinate" />
         <activity android:name=".CreateNewTrack" />
-        <activity android:name=".EditTracksActivity"></activity>
+        <activity android:name=".EditTracksActivity" />
+        <activity android:name=".EditTrack"></activity>
     </application>
 
 </manifest>

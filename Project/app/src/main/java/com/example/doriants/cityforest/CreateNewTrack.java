@@ -153,7 +153,8 @@ public class CreateNewTrack extends AppCompatActivity {
         double distance = Double.parseDouble(distance_field.getText().toString());
 
         Track track = new Track(
-                current_route,
+                castRouteToJson(),
+                key,
                 track_name_field.getText().toString(),
                 starting_point.getSelectedItem().toString(),
                 ending_point.getSelectedItem().toString(),
@@ -175,5 +176,14 @@ public class CreateNewTrack extends AppCompatActivity {
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put(key, trackMap);
         tracks.updateChildren(childUpdates);
+    }
+
+    public String castRouteToJson(){
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        String json = gson.toJson(this.current_route, DirectionsRoute.class);
+        return json;
     }
 }

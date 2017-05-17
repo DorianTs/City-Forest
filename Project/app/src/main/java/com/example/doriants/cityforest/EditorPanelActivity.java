@@ -63,6 +63,7 @@ import static com.example.doriants.cityforest.Constants.FINISH_EDIT_TRACK_MODE;
 import static com.example.doriants.cityforest.Constants.MAX_NUM_OF_TRACK_COORDINATES;
 import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 import static com.example.doriants.cityforest.Constants.NEW_TRACK;
+import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
 
 public class EditorPanelActivity extends AppCompatActivity {
 
@@ -318,7 +319,6 @@ public class EditorPanelActivity extends AppCompatActivity {
                     /*For each coordinate in the database, we want to create a new marker
                     * for it and to show the marker on the map*/
                     Map<String, Object> cor = ((Map<String, Object>) entry.getValue());
-
                     /*Now the object 'cor' holds a *map* for a specific coordinate*/
                     String positionJSON = (String) cor.get("position");
                     Position position = retrievePositionFromJson(positionJSON);
@@ -390,7 +390,7 @@ public class EditorPanelActivity extends AppCompatActivity {
         routeLine = new PolylineOptions()
                 .add(points)
                 .color(Color.RED)
-                .width(6);
+                .width(ROUTE_LINE_WIDTH);
         map.addPolyline(routeLine);
 
     }

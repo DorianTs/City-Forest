@@ -50,6 +50,8 @@
     <string name="strating_point_txt">התחלה -</string>
     <string name="distance_txt">מרחק</string>
     <string name="ending_point_txt_heb">סיום -</string>
+    <string name="no_track_name">-ללא שם-</string>
+    <string name="update_button">Update</string>
 
     <string-array name="train_stations">
         <item>Choose a station</item>

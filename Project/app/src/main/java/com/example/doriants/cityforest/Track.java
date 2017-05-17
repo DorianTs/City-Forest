@@ -12,7 +12,8 @@ import java.util.Map;
 
 public class Track {
 
-    private DirectionsRoute route;
+    private String route;
+    private String db_key;
     private String track_name;
     private String starting_point;
     private String ending_point;
@@ -32,13 +33,14 @@ public class Track {
 
     }
 
-    public Track(DirectionsRoute route, String track_name, String starting_point,
+    public Track(String route, String db_key, String track_name, String starting_point,
                  String ending_point, double duration, double length, String level,
                  String season, boolean has_water, boolean suitable_for_bikes,
                  boolean suitable_for_dogs, boolean suitable_for_families, boolean is_romantic,
                  String additional_info){
 
         this.route = route;
+        this.db_key = db_key;
         this.track_name = track_name;
         this.starting_point = starting_point;
         this.ending_point = ending_point;
@@ -58,7 +60,8 @@ public class Track {
     public Map<String, Object> toMap(){
 
         HashMap<String, Object> result = new HashMap<>();
-        result.put("route", castRouteToJson());
+        result.put("route", this.route);
+        result.put("key", this.db_key);
         result.put("track_name", this.track_name);
         result.put("starting_point", this.starting_point);
         result.put("ending_point", this.ending_point);
@@ -76,19 +79,22 @@ public class Track {
         return result;
     }
 
-    public String castRouteToJson(){
+    /*public String castRouteToJson(){
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.serializeSpecialFloatingPointValues();
 
         Gson gson = gsonBuilder.create();
         String json = gson.toJson(this.route, DirectionsRoute.class);
         return json;
-    }
+    }*/
 
     //=========================Getters & Setters=========================//
 
-    public DirectionsRoute getRoute(){
+    public String getRoute(){
         return route;
+    }
+    public String getDb_key(){
+        return db_key;
     }
     public String getTrack_name(){
         return track_name;
@@ -105,7 +111,7 @@ public class Track {
     public double getLength(){
         return length;
     }
-    public String level(){
+    public String getLevel(){
         return level;
     }
     public String getSeason(){
@@ -130,8 +136,11 @@ public class Track {
         return additional_info;
     }
 
-    public void setRoute(DirectionsRoute route){
+    public void setRoute(String route){
         this.route = route;
+    }
+    public void setDb_key(String db_key){
+        this.db_key = db_key;
     }
     public void setTrack_name(String track_name){
         this.track_name = track_name;

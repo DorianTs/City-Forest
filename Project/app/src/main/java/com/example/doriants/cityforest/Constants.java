@@ -13,6 +13,7 @@ public final class Constants {
     public static final String IS_COORDINATE_MAP_CREATED = "Is coordinate map created";
     public static final String COORDINATE_KEY = "Coordinate key";
     public static final String CHOSEN_TRACK = "Chosen Track";
+    public static final String TRACK_EDITED = "Track Edited";
 
     public static final int NEW_COORDINATE = 100;
     public static final int COORDINATE_CREATED = 101;
@@ -25,5 +26,7 @@ public final class Constants {
     public static boolean EDIT_COORDINATE_MODE = false;
     public static boolean ADD_TRACK_MODE = false;
     public static boolean FINISH_EDIT_TRACK_MODE = false;
+
+    public static int ROUTE_LINE_WIDTH = 4;
 
 }
