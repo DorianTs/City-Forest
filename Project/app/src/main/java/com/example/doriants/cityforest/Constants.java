@@ -13,13 +13,15 @@ public final class Constants {
     public static final String IS_COORDINATE_MAP_CREATED = "Is coordinate map created";
     public static final String COORDINATE_KEY = "Coordinate key";
     public static final String CHOSEN_TRACK = "Chosen Track";
-    public static final String TRACK_EDITED = "Track Edited";
+    public static final String TRACK_EDIT = "Track Edit";
+
 
     public static final int NEW_COORDINATE = 100;
     public static final int COORDINATE_CREATED = 101;
     public static final int MAX_NUM_OF_TRACK_COORDINATES = 25;
     public static final int NEW_TRACK = 200;
     public static final int TRACK_CREATED = 201;
+    public static final int TRACK_EDITED = 202;
 
     public static boolean ADD_COORDINATE_MODE = false;
     public static boolean DELETE_COORDINATE_MODE = false;

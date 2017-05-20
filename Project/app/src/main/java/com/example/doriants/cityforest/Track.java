@@ -61,7 +61,7 @@ public class Track {
 
         HashMap<String, Object> result = new HashMap<>();
         result.put("route", this.route);
-        result.put("key", this.db_key);
+        result.put("db_key", this.db_key);
         result.put("track_name", this.track_name);
         result.put("starting_point", this.starting_point);
         result.put("ending_point", this.ending_point);
@@ -78,15 +78,6 @@ public class Track {
 
         return result;
     }
-
-    /*public String castRouteToJson(){
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.serializeSpecialFloatingPointValues();
-
-        Gson gson = gsonBuilder.create();
-        String json = gson.toJson(this.route, DirectionsRoute.class);
-        return json;
-    }*/
 
     //=========================Getters & Setters=========================//
 

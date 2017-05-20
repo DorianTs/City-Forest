@@ -12,8 +12,6 @@ import com.google.firebase.database.Query;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import static com.example.doriants.cityforest.Constants.TRACK_EDITED;
-
 
 public class MyFirebaseListAdapter extends FirebaseListAdapter<Track> {
 
@@ -32,7 +30,7 @@ public class MyFirebaseListAdapter extends FirebaseListAdapter<Track> {
     }
 
     @Override
-    protected void populateView(View v, final Track track, int position) {
+    protected void populateView(View v, Track track, int position) {
 
         // Lookup view for data population
         TextView trackName = (TextView)v.findViewById(R.id.trackName);
@@ -40,7 +38,6 @@ public class MyFirebaseListAdapter extends FirebaseListAdapter<Track> {
         TextView endingPoint = (TextView)v.findViewById(R.id.endingPoint);
         TextView trackLevel = (TextView)v.findViewById(R.id.trackLevel);
         TextView trackDistance = (TextView)v.findViewById(R.id.trackDistance);
-
 
         String track_name = track.getTrack_name();
         if(track_name.equals(""))
@@ -53,14 +50,5 @@ public class MyFirebaseListAdapter extends FirebaseListAdapter<Track> {
 
         String distance = "" + track.getLength();
         trackDistance.setText(distance);
-    }
-
-    public String castTrackToJson(Track t){
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.serializeSpecialFloatingPointValues();
-
-        Gson gson = gsonBuilder.create();
-        String json = gson.toJson(t, Track.class);
-        return json;
     }
 }

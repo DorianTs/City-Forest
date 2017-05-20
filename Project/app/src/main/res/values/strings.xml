@@ -9,6 +9,7 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_delete_coordinate">Delete this coordinate?</string>
     <string name="dialog_edit_coordinate">Edit this coordinate info?</string>
+    <string name="dialog_delete_track">Delete this track?</string>
     <!--End of dialogs -->
 
 
@@ -48,7 +49,7 @@
     <string name="save_track_butt">Save Track</string>
     <string name="track_level">רמת קושי</string>
     <string name="strating_point_txt">התחלה -</string>
-    <string name="distance_txt">מרחק</string>
+    <string name="distance_txt">מרחק (קילומטרים)</string>
     <string name="ending_point_txt_heb">סיום -</string>
     <string name="no_track_name">-ללא שם-</string>
     <string name="update_button">Update</string>
@@ -93,4 +94,8 @@
         <item>סתיו</item>
         <item>אביב</item>
     </string-array>
+
+    <string name="edit_options_see_on_map">See on the map</string>
+    <string name="edit_options_edit_track">Edit track</string>
+    <string name="edit_options_delete_track">Delete track</string>
 </resources>

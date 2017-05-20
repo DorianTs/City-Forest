@@ -1,5 +1,7 @@
 package com.example.doriants.cityforest;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +37,7 @@ import java.util.Map;
 
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
 import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
-import static com.example.doriants.cityforest.Constants.TRACK_EDITED;
+import static com.example.doriants.cityforest.Constants.TRACK_EDIT;
 
 public class EditTracksActivity extends AppCompatActivity {
 
@@ -139,13 +141,48 @@ public class EditTracksActivity extends AppCompatActivity {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Track track = (Track) parent.getItemAtPosition(position);
-            DirectionsRoute route = retrieveRouteFromJson(track.getRoute());
-            if(routeLine != null)
-                map.removePolyline(routeLine.getPolyline());
-            drawRoute(route);
+
+            dialogOptions(track);
+        }
+
+        private void dialogOptions(final Track track) {
+            CharSequence options[] = new CharSequence[] {
+                    getResources().getString(R.string.edit_options_see_on_map),
+                    getResources().getString(R.string.edit_options_edit_track),
+                    getResources().getString(R.string.edit_options_delete_track)};
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(EditTracksActivity.this);
+            builder.setTitle("Choose your action");
+            builder.setItems(options, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selection) {
+                    switch(selection){
+                        case 0:{ // see on map selection
+                            DirectionsRoute route = retrieveRouteFromJson(track.getRoute());
+                            if(routeLine != null)
+                                map.removePolyline(routeLine.getPolyline());
+                            drawRoute(route);
+                            break;
+                        }
+                        case 1:{ // edit the track
+                            Intent i = new Intent(EditTracksActivity.this, EditTrack.class);
+                            i.putExtra(TRACK_EDIT, track.getDb_key());
+                            EditTracksActivity.this.startActivity(i);
+                            break;
+                        }
+                        case 2:{ // delete the track
+                            dialogDeleteTrack(track.getDb_key());
+                            break;
+                        }
+                    }
+                }
+            });
+            builder.show();
         }
 
     }
+
+
 
     private void drawRoute(DirectionsRoute route) {
         // Convert LineString coordinates into LatLng[]
@@ -188,6 +225,25 @@ public class EditTracksActivity extends AppCompatActivity {
         CameraPosition.Builder cpBuilder = new CameraPosition.Builder(cameraPosValue);
         CameraPosition tempPos = cpBuilder.build();
         map.setCameraPosition(tempPos);
+    }
+
+    private void dialogDeleteTrack(final String key){
+        AlertDialog.Builder builder = new AlertDialog.Builder(EditTracksActivity.this);
+        builder.setMessage(getResources().getString(R.string.dialog_delete_track));
+
+        builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                tracks.child(key).removeValue();
+            }
+        });
+        builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                return;
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
 

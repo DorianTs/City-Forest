@@ -3,25 +3,34 @@ package com.example.doriants.cityforest;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.mapbox.services.directions.v5.models.DirectionsRoute;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.example.doriants.cityforest.Constants.TRACK_EDIT;
 import static com.example.doriants.cityforest.Constants.TRACK_EDITED;
 
 public class EditTrack extends AppCompatActivity {
 
     private FirebaseDatabase database;
     private DatabaseReference tracks;
-    private Track track = null;
+    private String track_db_key;
+    private Track edited_track;
 
     private EditText track_name_field;
     private Spinner starting_point;
@@ -49,7 +58,7 @@ public class EditTrack extends AppCompatActivity {
         tracks = database.getReference("tracks");
 
         Intent i = getIntent();
-        track = retreiveTrackFromJson(i.getStringExtra(TRACK_EDITED));
+        track_db_key = i.getStringExtra(TRACK_EDIT);
 
         track_name_field = (EditText)findViewById(R.id.trackNameField);
         starting_point = (Spinner)findViewById(R.id.startingPoint);
@@ -67,40 +76,59 @@ public class EditTrack extends AppCompatActivity {
         update_button = (Button)findViewById(R.id.updateButton);
         cancel_button = (Button)findViewById(R.id.cancelButton);
 
-        initiateSpinner(starting_point, R.array.train_stations);
-        initiateSpinner(ending_point, R.array.train_stations);
-        initiateSpinner(track_level, R.array.track_level);
-        initiateSpinner(season, R.array.season);
-
-        //update_button.setOnClickListener();
-        //cancel_button.setOnClickListener();
-
+        update_button.setOnClickListener(new ClickListener());
+        cancel_button.setOnClickListener(new ClickListener());
 
         initiateScreenValues();
     }
 
     private void initiateScreenValues() {
-        track_name_field.setText(track.getTrack_name());
-        duration_field.setText(""+track.getDuration());
-        distance_field.setText(""+track.getLength());
-        has_water.setActivated(track.getHas_water());
-        suitable_for_bikes.setActivated(track.getSuitable_for_bikes());
-        suitable_for_dogs.setActivated(track.getSuitable_for_dogs());
-        suitable_for_families.setActivated(track.getSuitable_for_families());
-        is_romantic.setActivated(track.getIs_romantic());
-        additional_info.setText(track.getAdditional_info());
+        tracks.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> tracksMap = (Map<String, Object>)dataSnapshot.getValue();
+                Map<String, Object> track = (Map<String, Object>)tracksMap.get(track_db_key);
+
+                track_name_field.setText((String)track.get("track_name"));
+                duration_field.setText(track.get("duration").toString());
+                distance_field.setText(track.get("length").toString());
+                has_water.setChecked((boolean)track.get("has_water"));
+                suitable_for_bikes.setChecked((boolean)track.get("suitable_for_bikes"));
+                suitable_for_dogs.setChecked((boolean)track.get("suitable_for_dogs"));
+                suitable_for_families.setChecked((boolean)track.get("suitable_for_families"));
+                is_romantic.setChecked((boolean)track.get("is_romantic"));
+                additional_info.setText((String)track.get("additional_info"));
+
+                initiateSpinner(starting_point, R.array.train_stations, (String)track.get("starting_point"));
+                initiateSpinner(ending_point, R.array.train_stations, (String)track.get("ending_point"));
+                initiateSpinner(track_level, R.array.track_level, (String)track.get("level"));
+                initiateSpinner(season, R.array.season, (String)track.get("season"));
+
+                edited_track = new Track((String)track.get("route"),
+                        track_db_key,
+                        (String)track.get("track_name"),
+                        (String)track.get("starting_point"),
+                        (String)track.get("ending_point"),
+                        Double.parseDouble(track.get("duration").toString()),
+                        Double.parseDouble(track.get("length").toString()),
+                        (String)track.get("level"),
+                        (String)track.get("season"),
+                        (boolean)track.get("has_water"),
+                        (boolean)track.get("suitable_for_bikes"),
+                        (boolean)track.get("suitable_for_dogs"),
+                        (boolean)track.get("suitable_for_families"),
+                        (boolean)track.get("is_romantic"),
+                        (String)track.get("additional_info"));
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
-    private Track retreiveTrackFromJson(String stringExtra) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.serializeSpecialFloatingPointValues();
-
-        Gson gson = gsonBuilder.create();
-        Track obj = gson.fromJson(stringExtra, Track.class);
-        return obj;
-    }
-
-    private void initiateSpinner(Spinner spinner,  int spinner_type){
+    private void initiateSpinner(Spinner spinner,  int spinner_type, String value){
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 spinner_type, R.layout.spinner_item);
@@ -109,7 +137,73 @@ public class EditTrack extends AppCompatActivity {
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
 
-        spinner.setSelection(adapter.getPosition(track.getStarting_point()));
+        spinner.setSelection(adapter.getPosition(value));
+    }
+
+    private class ClickListener implements View.OnClickListener{
+        @Override
+        public void onClick(View v) {
+            if(v.getId() == update_button.getId()){
+                boolean canSave = checkFields();
+                if(canSave){
+                    updateTrack();
+                    Intent i = new Intent(EditTrack.this, EditTracksActivity.class);
+                    setResult(TRACK_EDITED);
+                    startActivity(i);
+                }
+            }
+            if(v.getId() == cancel_button.getId()){
+                onBackPressed();
+            }
+        }
+    }
+
+    private void updateTrack() {
+
+        double duration = Double.parseDouble(duration_field.getText().toString());
+        double distance = Double.parseDouble(distance_field.getText().toString());
+
+        edited_track.setTrack_name(track_name_field.getText().toString());
+        edited_track.setStarting_point(starting_point.getSelectedItem().toString());
+        edited_track.setEnding_point(ending_point.getSelectedItem().toString());
+        edited_track.setDuration(duration);
+        edited_track.setLength(distance);
+        edited_track.setLevel(track_level.getSelectedItem().toString());
+        edited_track.setSeason(season.getSelectedItem().toString());
+        edited_track.setHas_water(has_water.isChecked());
+        edited_track.setSuitable_for_bikes(suitable_for_bikes.isChecked());
+        edited_track.setSuitable_for_dogs(suitable_for_dogs.isChecked());
+        edited_track.setSuitable_for_families(suitable_for_families.isChecked());
+        edited_track.setIs_romantic(is_romantic.isChecked());
+        edited_track.setAdditional_info(additional_info.getText().toString());
+
+        /*Converting our track object to a map, that makes
+        * the track ready to be entered to the JSON tree*/
+        Map<String, Object> trackMap = edited_track.toMap();
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put(track_db_key, trackMap);
+        tracks.updateChildren(childUpdates);
+    }
+
+    private boolean checkFields(){
+        if(starting_point.getSelectedItem().toString().equals(getResources().getString(R.string.choose_a_station))
+                || ending_point.getSelectedItem().toString().equals(getResources().getString(R.string.choose_a_station))){
+            Toast.makeText(this, R.string.choose_station_empty, Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if(distance_field.getText().toString().equals("")){
+            Toast.makeText(this, R.string.choose_distance_empty, Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        if(track_level.getSelectedItem().toString().equals(getResources().getString(R.string.choose_a_level))){
+            Toast.makeText(this, R.string.choose_level_empty, Toast.LENGTH_LONG).show();
+            return false;
+        }
+
+        return true;
     }
 
 }
