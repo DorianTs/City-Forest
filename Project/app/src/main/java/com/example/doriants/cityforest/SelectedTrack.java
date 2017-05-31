@@ -1,15 +1,21 @@
 package com.example.doriants.cityforest;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.LocationSource;
 import com.google.firebase.database.DataSnapshot;
@@ -22,6 +28,7 @@ import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -41,8 +48,9 @@ import java.util.Map;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
 import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
 import static com.example.doriants.cityforest.Constants.SELECTED_TRACK;
+import static com.mapbox.services.android.telemetry.location.AndroidLocationEngine.getLocationEngine;
 
-public class SelectedTrack extends AppCompatActivity{
+public class SelectedTrack extends AppCompatActivity implements PermissionsListener {
 
     private MapView mapView;
     private MapboxMap map;
@@ -75,6 +83,10 @@ public class SelectedTrack extends AppCompatActivity{
         MapboxAccountManager.start(this, getString(R.string.access_token));
         setContentView(R.layout.activity_selected_track);
 
+        // Get the location engine object for later use.
+        locationEngine = getLocationEngine(this);
+        locationEngine.activate();
+
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new myOnMapReadyCallback());
@@ -82,24 +94,22 @@ public class SelectedTrack extends AppCompatActivity{
         database = FirebaseDatabase.getInstance();
         tracks = database.getReference("tracks");
 
-
-
         Intent i = getIntent();
         track_db_key = i.getStringExtra(SELECTED_TRACK);
 
-        track_name_field = (TextView)findViewById(R.id.trackNameField);
-        starting_point_field = (TextView)findViewById(R.id.startingPointField);
-        ending_point_field = (TextView)findViewById(R.id.endingPointField);
-        distance_field = (TextView)findViewById(R.id.distanceField);
-        duration_field = (TextView)findViewById(R.id.durationField);
-        level_field = (TextView)findViewById(R.id.levelField);
-        season_field = (TextView)findViewById(R.id.seasonField);
-        summary_field = (TextView)findViewById(R.id.summaryField);
-        has_water_checkbox = (CheckBox)findViewById(R.id.hasWaterCheckbox);
-        suitable_for_bikes_checkbox = (CheckBox)findViewById(R.id.suitableForBikesCheckbox);
-        suitable_for_dogs_checkbox = (CheckBox)findViewById(R.id.suitableForDogsCheckbox);
-        suitable_for_families_checkbox = (CheckBox)findViewById(R.id.suitableForFamiliesCheckbox);
-        is_romantic_checkbox = (CheckBox)findViewById(R.id.isRomanticCheckbox);
+        track_name_field = (TextView) findViewById(R.id.trackNameField);
+        starting_point_field = (TextView) findViewById(R.id.startingPointField);
+        ending_point_field = (TextView) findViewById(R.id.endingPointField);
+        distance_field = (TextView) findViewById(R.id.distanceField);
+        duration_field = (TextView) findViewById(R.id.durationField);
+        level_field = (TextView) findViewById(R.id.levelField);
+        season_field = (TextView) findViewById(R.id.seasonField);
+        summary_field = (TextView) findViewById(R.id.summaryField);
+        has_water_checkbox = (CheckBox) findViewById(R.id.hasWaterCheckbox);
+        suitable_for_bikes_checkbox = (CheckBox) findViewById(R.id.suitableForBikesCheckbox);
+        suitable_for_dogs_checkbox = (CheckBox) findViewById(R.id.suitableForDogsCheckbox);
+        suitable_for_families_checkbox = (CheckBox) findViewById(R.id.suitableForFamiliesCheckbox);
+        is_romantic_checkbox = (CheckBox) findViewById(R.id.isRomanticCheckbox);
 
         has_water_checkbox.setClickable(false);
         suitable_for_bikes_checkbox.setClickable(false);
@@ -108,6 +118,16 @@ public class SelectedTrack extends AppCompatActivity{
         is_romantic_checkbox.setClickable(false);
 
         initiateScreenValues();
+
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.location_toggle_fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (map != null) {
+                    toggleGps(!map.isMyLocationEnabled());
+                }
+            }
+        });
     }
 
 
@@ -115,25 +135,25 @@ public class SelectedTrack extends AppCompatActivity{
         tracks.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> tracksMap = (Map<String, Object>)dataSnapshot.getValue();
-                Map<String, Object> track = (Map<String, Object>)tracksMap.get(track_db_key);
+                Map<String, Object> tracksMap = (Map<String, Object>) dataSnapshot.getValue();
+                Map<String, Object> track = (Map<String, Object>) tracksMap.get(track_db_key);
 
-                DirectionsRoute route = retrieveRouteFromJson((String)track.get("route"));
+                DirectionsRoute route = retrieveRouteFromJson((String) track.get("route"));
                 drawRoute(route);
 
-                track_name_field.setText((String)track.get("track_name"));
-                starting_point_field.setText((String)track.get("starting_point"));
-                ending_point_field.setText((String)track.get("ending_point"));
+                track_name_field.setText((String) track.get("track_name"));
+                starting_point_field.setText((String) track.get("starting_point"));
+                ending_point_field.setText((String) track.get("ending_point"));
                 distance_field.setText(track.get("length").toString());
                 duration_field.setText(track.get("duration").toString());
-                level_field.setText((String)track.get("level"));
-                season_field.setText((String)track.get("season"));
-                summary_field.setText((String)track.get("additional_info"));
-                has_water_checkbox.setChecked((boolean)track.get("has_water"));
-                suitable_for_bikes_checkbox.setChecked((boolean)track.get("suitable_for_bikes"));
-                suitable_for_families_checkbox.setChecked((boolean)track.get("suitable_for_families"));
-                suitable_for_dogs_checkbox.setChecked((boolean)track.get("suitable_for_dogs"));
-                is_romantic_checkbox.setChecked((boolean)track.get("is_romantic"));
+                level_field.setText((String) track.get("level"));
+                season_field.setText((String) track.get("season"));
+                summary_field.setText((String) track.get("additional_info"));
+                has_water_checkbox.setChecked((boolean) track.get("has_water"));
+                suitable_for_bikes_checkbox.setChecked((boolean) track.get("suitable_for_bikes"));
+                suitable_for_families_checkbox.setChecked((boolean) track.get("suitable_for_families"));
+                suitable_for_dogs_checkbox.setChecked((boolean) track.get("suitable_for_dogs"));
+                is_romantic_checkbox.setChecked((boolean) track.get("is_romantic"));
             }
 
             @Override
@@ -172,6 +192,23 @@ public class SelectedTrack extends AppCompatActivity{
         return obj;
     }
 
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(this, "This app needs location permissions in order to show its functionality.",
+                Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocation(true);
+        } else {
+            Toast.makeText(this, "You didn't grant location permissions.",
+                    Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
 
     private class myOnMapReadyCallback implements OnMapReadyCallback {
         @Override
@@ -183,7 +220,7 @@ public class SelectedTrack extends AppCompatActivity{
     }
 
 
-    private void showDefaultLocation(){
+    private void showDefaultLocation() {
         /*Showing the default position to the editor*/
         double[] cameraPosValue = new double[5];
         cameraPosValue[0] = DEFAULT_JERUSALEM_COORDINATE.getLatitude();
@@ -198,7 +235,63 @@ public class SelectedTrack extends AppCompatActivity{
     }
 
 
+    private void toggleGps(boolean enableGps) {
+        if (enableGps) {
+            // Check if user has granted location permission
+            permissionsManager = new PermissionsManager(this);
+            if (!PermissionsManager.areLocationPermissionsGranted(this)) {
+                permissionsManager.requestLocationPermissions(this);
+            } else {
+                enableLocation(true);
+            }
+        } else {
+            enableLocation(false);
+            showDefaultLocation();
+        }
+    }
 
+    private void enableLocation(boolean enabled) {
+        if (enabled) {
+            // If we have the last location of the user, we can move the camera to that position.
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            Location lastLocation = locationEngine.getLastLocation();
+            if (lastLocation != null) {
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), 16));
+            }
+
+            locationEngineListener = new LocationEngineListener() {
+                @Override
+                public void onConnected() {
+                    // No action needed here.
+                }
+
+                @Override
+                public void onLocationChanged(Location location) {
+                    if (location != null) {
+                        // Move the map camera to where the user location is and then remove the
+                        // listener so the camera isn't constantly updating when the user location
+                        // changes. When the user disables and then enables the location again, this
+                        // listener is registered again and will adjust the camera once again.
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 16));
+                        locationEngine.removeLocationEngineListener(this);
+                    }
+                }
+            };
+            locationEngine.addLocationEngineListener(locationEngineListener);
+            floatingActionButton.setImageResource(R.drawable.ic_location_disabled_24dp);
+        } else {
+            floatingActionButton.setImageResource(R.drawable.ic_my_location_24dp);
+        }
+        // Enable or disable the location layer on the map
+        map.setMyLocationEnabled(enabled);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
 
 
 
@@ -237,6 +330,11 @@ public class SelectedTrack extends AppCompatActivity{
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        // Ensure no memory leak occurs if we register the location listener but the call hasn't
+        // been made yet.
+        if (locationEngineListener != null) {
+            locationEngine.removeLocationEngineListener(locationEngineListener);
+        }
     }
 
     @Override
