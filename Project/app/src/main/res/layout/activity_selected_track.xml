@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_new_dream"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    tools:context="com.example.doriants.cityforest.SelectedTrack">
+
+
+    <LinearLayout
+        android:id="@+id/editor_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:ignore="ScrollViewSize">
+
+
+        <RelativeLayout
+            android:id="@+id/mapLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:ignore="UselessParent">
+
+            <com.mapbox.mapboxsdk.maps.MapView
+                android:id="@+id/mapview"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true">
+
+                <ImageView
+                    android:id="@+id/smallLogo"
+                    app:srcCompat="@drawable/cf_small_logo"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:contentDescription="@string/cityforest_logo" />
+
+            </com.mapbox.mapboxsdk.maps.MapView>
+
+            <!--<android.support.design.widget.FloatingActionButton
+                android:id="@+id/location_toggle_fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|bottom"
+                android:layout_margin="16dp"
+                app:srcCompat="@drawable/ic_my_location_24dp"
+                tools:ignore="VectorDrawableCompat"
+                app:backgroundTint="@color/colorAccent"/>-->
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/trackNameField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_horizontal"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <GridLayout
+            android:id="@+id/startEndPoints"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:background="@color/colorPrimaryDark"
+            android:columnCount="2">
+
+            <TextView
+                android:id="@+id/endingPointTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/ending_point_hebrew"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:ignore="UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/startingPointTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:text="@string/starting_point_hebrew"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:ignore="UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/endingPointField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:textSize="15sp"
+                tools:ignore="UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/startingPointField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_gravity="fill_horizontal"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:textSize="15sp"
+                tools:ignore="UnusedAttribute" />
+
+        </GridLayout>
+
+        <GridLayout
+            android:id="@+id/dryDetails"
+            android:layout_width="350dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:background="@color/colorPrimaryDark"
+            android:columnCount="4">
+
+            <TextView
+                android:id="@+id/seasonTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:text="עונה"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText"
+                tools:targetApi="lollipop" />
+
+            <TextView
+                android:id="@+id/levelTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:text="רמת קושי"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText,UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/durationTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:text="זמן(שעות)"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText"
+                tools:targetApi="lollipop" />
+
+            <TextView
+                android:id="@+id/distanceTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                android:text="מרחק(קמ')"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText,UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/seasonField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                tools:ignore="UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/levelField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                tools:ignore="UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/durationField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                tools:ignore="UnusedAttribute" />
+
+            <TextView
+                android:id="@+id/distanceField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_rowWeight="1"
+                android:gravity="center_horizontal"
+                tools:ignore="UnusedAttribute" />
+        </GridLayout>
+
+        <TextView
+            android:id="@+id/summaryField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:id="@+id/hasWaterLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="30dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/hasWaterCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp" />
+
+            <TextView
+                android:id="@+id/hasWaterTxt"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/has_water_heb"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/suitableForBikesLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/suitableForBikesCheckbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/suitableForBikesTxt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/suitable_for_bikes_heb"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/suitableForFamiliesLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/suitableForFamiliesCheckbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/suitableForFamiliesTxt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/suitable_for_families_heb"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/suitableForDogsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/suitableForDogsCheckbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/suitableForDogsTxt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="@string/suitable_for_dogs_heb"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/isRomanticLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/isRomanticCheckbox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/isRomanticTxt"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="@string/is_romantic_heb"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

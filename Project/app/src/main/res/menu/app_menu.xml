@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:title="@string/menu_home"
+        android:id="@+id/homeActivity"
+        android:showAsAction="always"
+        tools:ignore="AppCompatResource"
+        android:visible="true" />
+    <item
+        android:title="@string/menu_tracks"
+        android:id="@+id/tracksActivity"/>
+
+    <item
+        android:title="@string/menu_adv_search"
+        android:id="@+id/searchTracksActivity" />
+    <item
+        android:title="@string/menu_user_guide"
+        android:id="@+id/userGuideActivity"/>
+
+    <item
+        android:title="@string/menu_contact_us"
+        android:id="@+id/contactUsActivity" />
+
+    <item
+        android:title="@string/menu_about_us"
+        android:id="@+id/aboutActivity" />
+
+
+</menu>

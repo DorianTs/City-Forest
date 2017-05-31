@@ -1,17 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/activity_home"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.example.doriants.cityforest.Home">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/editor_layout"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:weightSum="1"
+tools:context="com.example.doriants.cityforest.Home">
 
-    <TextView
+
+<RelativeLayout
+    android:id="@+id/mapLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="UselessParent">
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapview"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <ImageView
+            android:id="@+id/smallLogo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/cityforest_logo"
+            app:srcCompat="@drawable/cf_small_logo" />
+    </com.mapbox.mapboxsdk.maps.MapView>
+</RelativeLayout>
+
+    <Button
+        android:id="@+id/advancedSearchButt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
-</RelativeLayout>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        android:background="@color/colorPrimary"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="@string/advanced_search_butt"
+        android:textSize="20sp" />
+</LinearLayout>

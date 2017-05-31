@@ -48,8 +48,6 @@ public class EditTracksActivity extends AppCompatActivity {
     private PolylineOptions routeLine;
 
     private ListView track_list;
-    private ArrayList<Track> tracks_array;
-    private TracksAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,11 +62,7 @@ public class EditTracksActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         tracks = database.getReference("tracks");
 
-        tracks_array = new ArrayList<>();
         track_list = (ListView) findViewById(R.id.track_list);
-
-        //adapter = new TracksAdapter(EditTracksActivity.this, tracks_array);
-        //getAllTracksFromDb(adapter);
 
         track_list.setOnItemClickListener(new ItemClickListener());
 
@@ -245,6 +239,7 @@ public class EditTracksActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
 
 
     @Override

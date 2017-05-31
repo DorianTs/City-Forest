@@ -1,6 +1,5 @@
 package com.example.doriants.cityforest;
 
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.services.commons.models.Position;
 
 public final class Constants {
@@ -14,6 +13,18 @@ public final class Constants {
     public static final String COORDINATE_KEY = "Coordinate key";
     public static final String CHOSEN_TRACK = "Chosen Track";
     public static final String TRACK_EDIT = "Track Edit";
+    public static final String SELECTED_TRACK = "Selected Track";
+
+    public static final String SEARCH_RESULT_QUERY = "Search Result query";
+    public static final String Q_STARTING_POINT = "Starting point";
+    public static final String Q_ENDING_POINT = "Ending point";
+    public static final String Q_LEVEL = "Level";
+    public static final String Q_SEASON = "Season";
+    public static final String Q_HAS_WATER = "Has water";
+    public static final String Q_SUITABLE_FOR_BIKES = "Suitable for bikes";
+    public static final String Q_SUITABLE_FOR_DOGS = "Suitable for dogs";
+    public static final String Q_SUITABLE_FOR_FAMILIES = "Suitable for families";
+    public static final String Q_IS_ROMANTIC = "Is romantic";
 
 
     public static final int NEW_COORDINATE = 100;

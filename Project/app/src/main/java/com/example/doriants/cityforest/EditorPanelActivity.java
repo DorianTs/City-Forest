@@ -654,6 +654,7 @@ public class EditorPanelActivity extends AppCompatActivity {
         return json;
     }
 
+
     @Override
     public void onResume() {
         super.onResume();

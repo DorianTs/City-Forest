@@ -1,10 +1,6 @@
 package com.example.doriants.cityforest;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.services.commons.models.Position;
-import com.mapbox.services.directions.v5.models.DirectionsRoute;
 
 import java.util.ArrayList;
 import java.util.HashMap;

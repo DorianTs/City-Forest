@@ -95,7 +95,28 @@
         <item>אביב</item>
     </string-array>
 
+
     <string name="edit_options_see_on_map">See on the map</string>
     <string name="edit_options_edit_track">Edit track</string>
     <string name="edit_options_delete_track">Delete track</string>
+    <string name="title_activity_main">MainActivity</string>
+
+
+    <string name="title_activity_home">Home</string>
+    <string name="home_action">Home</string>
+    <string name="menu_home">דף הבית</string>
+    <string name="menu_about_us">אודות</string>
+    <string name="menu_adv_search">חיפוש מתקדם</string>
+    <string name="menu_user_guide">מדריך למשתמש</string>
+    <string name="menu_tracks">מסלולים</string>
+    <string name="menu_contact_us">צור קשר</string>
+    <string name="advanced_search_butt">חיפוש מתקדם</string>
+    <string name="search_button">Search</string>
+    <string name="suitable_for_bikes_heb">התאמה לאופניים</string>
+    <string name="suitable_for_dogs_heb">התאמה לכלבים</string>
+    <string name="suitable_for_families_heb">התאמה למשפחות</string>
+    <string name="has_water_heb">מסלול עם מים</string>
+    <string name="starting_point_hebrew">נקודת התחלה</string>
+    <string name="ending_point_hebrew">נקודת סיום</string>
+    <string name="is_romantic_heb">רומנטי</string>
 </resources>
