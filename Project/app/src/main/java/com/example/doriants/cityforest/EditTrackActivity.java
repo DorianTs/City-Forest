@@ -16,8 +16,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +23,7 @@ import java.util.Map;
 import static com.example.doriants.cityforest.Constants.TRACK_EDIT;
 import static com.example.doriants.cityforest.Constants.TRACK_EDITED;
 
-public class EditTrack extends AppCompatActivity {
+public class EditTrackActivity extends AppCompatActivity {
 
     private FirebaseDatabase database;
     private DatabaseReference tracks;
@@ -147,7 +145,7 @@ public class EditTrack extends AppCompatActivity {
                 boolean canSave = checkFields();
                 if(canSave){
                     updateTrack();
-                    Intent i = new Intent(EditTrack.this, EditTracksActivity.class);
+                    Intent i = new Intent(EditTrackActivity.this, EditTracksActivity.class);
                     setResult(TRACK_EDITED);
                     startActivity(i);
                 }

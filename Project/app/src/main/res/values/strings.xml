@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CityForest</string>
+    <string name="app_name">עיר יער</string>
     <string name="cityforest_logo">CF logo</string>
     <string name="access_token">pk.eyJ1IjoiZG9yaWFudHMiLCJhIjoiY2owODMzdm9kMDAxZTMyc2Jwam9rbGVxNSJ9.XYFTdmoxupXYITEOHS-HrA</string>
 
@@ -10,6 +10,9 @@
     <string name="dialog_delete_coordinate">Delete this coordinate?</string>
     <string name="dialog_edit_coordinate">Edit this coordinate info?</string>
     <string name="dialog_delete_track">Delete this track?</string>
+    <string name="dialog_exit_app_title">Exit CityForest</string>
+    <string name="dialog_exit_app_body">Are you sure you want to exit the app?</string>
+    <string name="dialog_yes">Yes</string>
     <!--End of dialogs -->
 
 
@@ -99,6 +102,7 @@
     <string name="edit_options_see_on_map">See on the map</string>
     <string name="edit_options_edit_track">Edit track</string>
     <string name="edit_options_delete_track">Delete track</string>
+    <string name="edit_options_choose_track">See track details</string>
     <string name="title_activity_main">MainActivity</string>
 
 
@@ -119,4 +123,17 @@
     <string name="starting_point_hebrew">נקודת התחלה</string>
     <string name="ending_point_hebrew">נקודת סיום</string>
     <string name="is_romantic_heb">רומנטי</string>
+    <string name="make_own_track_butt">בניית מסלול אישי</string>
+    <string name="make_own_track_txt">מעוניין לבנות מסלול הליכה אישי?</string>
+    <string name="Make_own_track_menu">צור מסלול חדש</string>
+    <string name="tracks_txt">רשימת מסלולים</string>
+    <string name="tracks_menu">רשימת מסלולים</string>
+    <string name="edit_tracks_button">Edit Tracks</string>
+    <string name="sign_out_action">התנתק</string>
+
+    <string name="permitted_editor">1UGTxtDh7UaO9WFi70CnG3njfE02</string>
+    <string name="home_button">Home</string>
+    <string name="editor_panel_button">Editor Panel</string>
+    <string name="app_title_txt">עיר יער</string>
+    <string name="what_are_you_up_to_today_txt">What are you up to today?</string>
 </resources>

@@ -3,15 +3,29 @@ package com.example.doriants.cityforest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,6 +48,10 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
+import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.mapbox.services.commons.ServicesException;
 import com.mapbox.services.commons.geojson.LineString;
 import com.mapbox.services.commons.models.Position;
@@ -64,8 +82,10 @@ import static com.example.doriants.cityforest.Constants.MAX_NUM_OF_TRACK_COORDIN
 import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 import static com.example.doriants.cityforest.Constants.NEW_TRACK;
 import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
+import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_CURRENT_LOCATION;
+import static com.mapbox.services.android.telemetry.location.AndroidLocationEngine.getLocationEngine;
 
-public class EditorPanelActivity extends AppCompatActivity {
+public class EditorPanelActivity extends AppCompatActivity implements PermissionsListener {
 
     private MapView mapView;
     private MapboxMap map;
@@ -73,14 +93,14 @@ public class EditorPanelActivity extends AppCompatActivity {
     private PolylineOptions routeLine;
     private FirebaseDatabase database;
     private DatabaseReference coordinates;
-    private Button add_coordinate_button;
-    private Button delete_coordinate_button;
-    private Button edit_coordinate_button;
-    private Button add_track_button;
+    private ImageButton add_coordinate_button;
+    private ImageButton delete_coordinate_button;
+    private ImageButton edit_coordinate_button;
+    private ImageButton add_track_button;
     private Button finish_edit_track_butt;
     private Button save_track;
     private Button continue_editing;
-    private Button edit_tracks_button;
+    private ImageButton edit_tracks_button;
     private TextView counter_coordinates;
 
     /*Count how many coordinates selected for creating a track (max of 25 coordinates)*/
@@ -88,6 +108,13 @@ public class EditorPanelActivity extends AppCompatActivity {
     private ArrayList<Double> track_coordinates = new ArrayList<>();
     private ArrayList<Marker> track_markers = new ArrayList<>();
     private ArrayList<Position> track_positions = new ArrayList<>();
+
+    private FloatingActionButton floatingActionButton;
+    private LocationEngine locationEngine;
+    private LocationEngineListener locationEngineListener;
+    private PermissionsManager permissionsManager;
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +124,10 @@ public class EditorPanelActivity extends AppCompatActivity {
         MapboxAccountManager.start(this, getString(R.string.access_token));
         setContentView(R.layout.activity_editor_panel);
 
+        // Get the location engine object for later use.
+        locationEngine = getLocationEngine(this);
+        locationEngine.activate();
+
         mapView = (MapView) findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(new myOnMapReadyCallback());
@@ -105,11 +136,11 @@ public class EditorPanelActivity extends AppCompatActivity {
         coordinates = database.getReference("coordinates");
 
         /*Buttons for different edit map modes*/
-        add_coordinate_button = (Button)findViewById(R.id.addCoordinateButt);
-        delete_coordinate_button = (Button)findViewById(R.id.deleteCoordinateButt);
-        edit_coordinate_button = (Button)findViewById(R.id.editCoordinateButt);
-        edit_tracks_button = (Button)findViewById(R.id.editTrackButton);
-        add_track_button = (Button)findViewById(R.id.addTrackButt);
+        add_coordinate_button = (ImageButton)findViewById(R.id.addCoordinateButt);
+        delete_coordinate_button = (ImageButton)findViewById(R.id.deleteCoordinateButt);
+        edit_coordinate_button = (ImageButton)findViewById(R.id.editCoordinateButt);
+        edit_tracks_button = (ImageButton)findViewById(R.id.editTrackButton);
+        add_track_button = (ImageButton)findViewById(R.id.addTrackButt);
         finish_edit_track_butt = (Button)findViewById(R.id.finishEditTrack);
         save_track = (Button)findViewById(R.id.saveTrack);
         continue_editing = (Button)findViewById(R.id.continueEditTrack);
@@ -135,6 +166,30 @@ public class EditorPanelActivity extends AppCompatActivity {
         finish_edit_track_butt.setVisibility(View.INVISIBLE);
         save_track.setVisibility(View.INVISIBLE);
         continue_editing.setVisibility(View.INVISIBLE);
+
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.location_toggle_fab);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (map != null) {
+                    toggleGps(!map.isMyLocationEnabled());
+                }
+            }
+        });
+    }
+
+    /*In order to be able to sign out from the logged in account, I have to
+    * check who is the logged in user.*/
+    @Override
+    protected void onStart() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        mGoogleApiClient.connect();
+        super.onStart();
     }
 
     private class ClickListener implements View.OnClickListener{
@@ -195,7 +250,6 @@ public class EditorPanelActivity extends AppCompatActivity {
             if(v.getId() == add_track_button.getId()){
                 if(ADD_TRACK_MODE){
                     ADD_TRACK_MODE = false;
-                    add_track_button.setText(R.string.add_track_button);
                     add_track_button.setBackgroundResource(android.R.drawable.btn_default);
 
                     /*
@@ -227,7 +281,6 @@ public class EditorPanelActivity extends AppCompatActivity {
                     EDIT_COORDINATE_MODE = false;
                     ADD_TRACK_MODE = true;
 
-                    add_track_button.setText(R.string.cancel_add_track_butt);
                     add_track_button.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
                     add_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
                     delete_coordinate_button.setBackgroundResource(android.R.drawable.btn_default);
@@ -282,7 +335,7 @@ public class EditorPanelActivity extends AppCompatActivity {
                 map.removePolyline(routeLine.getPolyline());
             }
             if(v.getId() == save_track.getId()){
-                Intent i = new Intent(EditorPanelActivity.this, CreateNewTrack.class);
+                Intent i = new Intent(EditorPanelActivity.this, CreateNewTrackActivity.class);
                 i.putExtra(CHOSEN_TRACK, castRouteToJson(currentRoute));
                 startActivityForResult(i, NEW_TRACK);
             }
@@ -407,17 +460,9 @@ public class EditorPanelActivity extends AppCompatActivity {
     }
 
     private void showDefaultLocation(){
-        /*Showing the default position to the editor*/
-        double[] cameraPosValue = new double[5];
-        cameraPosValue[0] = DEFAULT_JERUSALEM_COORDINATE.getLatitude();
-        cameraPosValue[1] = DEFAULT_JERUSALEM_COORDINATE.getLongitude();
-        cameraPosValue[2] = 0;
-        cameraPosValue[3] = 0;
-        cameraPosValue[4] = 10;
-
-        CameraPosition.Builder cpBuilder = new CameraPosition.Builder(cameraPosValue);
-        CameraPosition tempPos = cpBuilder.build();
-        map.setCameraPosition(tempPos);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(DEFAULT_JERUSALEM_COORDINATE.getLatitude(),
+                        DEFAULT_JERUSALEM_COORDINATE.getLongitude()), 10));
     }
 
     private class MyOnMapClickListener implements MapboxMap.OnMapClickListener{
@@ -486,6 +531,10 @@ public class EditorPanelActivity extends AppCompatActivity {
     private class MyOnMarkerClickListener implements MapboxMap.OnMarkerClickListener{
         @Override
         public boolean onMarkerClick(@NonNull Marker marker) {
+
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(marker.getPosition().getLatitude(),
+                    marker.getPosition().getLongitude()), 16));
+
             if(DELETE_COORDINATE_MODE){
                 dialogDeleteCoordinate(marker);
                 return true;
@@ -553,7 +602,7 @@ public class EditorPanelActivity extends AppCompatActivity {
                 /*Sending the key for the edit coordinate activity
                 * to be able to update this coordinate in the database*/
                 String key = getMarkerHashKey(marker);
-                Intent i = new Intent(EditorPanelActivity.this, EditCoordinate.class);
+                Intent i = new Intent(EditorPanelActivity.this, EditCoordinateActivity.class);
                 i.putExtra(COORDINATE_KEY, key);
                 startActivity(i);
             }
@@ -619,7 +668,7 @@ public class EditorPanelActivity extends AppCompatActivity {
 
         builder.setPositiveButton(R.string.dialog_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Intent i = new Intent(EditorPanelActivity.this, CreateNewCoordinate.class);
+                Intent i = new Intent(EditorPanelActivity.this, CreateNewCoordinateActivity.class);
                 i.putExtra(CHOSEN_COORDINATE, castLatLngToJson(point));
                 startActivityForResult(i, NEW_COORDINATE);
             }
@@ -654,6 +703,118 @@ public class EditorPanelActivity extends AppCompatActivity {
         return json;
     }
 
+
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(this, "This app needs location permissions in order to show its functionality.",
+                Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocation(true);
+        } else {
+            Toast.makeText(this, "You didn't grant location permissions.",
+                    Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    private void toggleGps(boolean enableGps) {
+        if (enableGps) {
+            // Check if user has granted location permission
+            permissionsManager = new PermissionsManager(this);
+            if (!PermissionsManager.areLocationPermissionsGranted(this)) {
+                permissionsManager.requestLocationPermissions(this);
+            } else {
+                enableLocation(true);
+            }
+        } else {
+            enableLocation(false);
+            showDefaultLocation();
+        }
+    }
+
+    private void enableLocation(boolean enabled) {
+        if (enabled) {
+            // If we have the last location of the user, we can move the camera to that position.
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            Location lastLocation = locationEngine.getLastLocation();
+            if (lastLocation != null) {
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), ZOOM_LEVEL_CURRENT_LOCATION));
+            }
+
+            locationEngineListener = new LocationEngineListener() {
+                @Override
+                public void onConnected() {
+                    // No action needed here.
+                }
+
+                @Override
+                public void onLocationChanged(Location location) {
+                    if (location != null) {
+                        // Move the map camera to where the user location is and then remove the
+                        // listener so the camera isn't constantly updating when the user location
+                        // changes. When the user disables and then enables the location again, this
+                        // listener is registered again and will adjust the camera once again.
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), ZOOM_LEVEL_CURRENT_LOCATION));
+                        locationEngine.removeLocationEngineListener(this);
+                    }
+                }
+            };
+            locationEngine.addLocationEngineListener(locationEngineListener);
+            floatingActionButton.setImageResource(R.drawable.ic_location_disabled_24dp);
+        } else {
+            floatingActionButton.setImageResource(R.drawable.ic_my_location_24dp);
+        }
+        // Enable or disable the location layer on the map
+        map.setMyLocationEnabled(enabled);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.editor_home_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()){
+            case R.id.signOut:
+                signOut();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /*Method signs out user's google account*/
+    private void signOut() {
+        FirebaseAuth.getInstance().signOut();
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(Status status) {
+                        Intent i = new Intent(EditorPanelActivity.this, SignInActivity.class);
+                        startActivity(i);
+                    }});
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(EditorPanelActivity.this, EditorHomeActivity.class);
+        startActivity(i);
+    }
 
     @Override
     public void onResume() {

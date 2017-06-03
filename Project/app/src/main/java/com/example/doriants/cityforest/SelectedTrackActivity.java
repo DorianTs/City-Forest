@@ -17,7 +17,6 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.LocationSource;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,7 +26,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -48,9 +46,10 @@ import java.util.Map;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
 import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
 import static com.example.doriants.cityforest.Constants.SELECTED_TRACK;
+import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_CURRENT_LOCATION;
 import static com.mapbox.services.android.telemetry.location.AndroidLocationEngine.getLocationEngine;
 
-public class SelectedTrack extends AppCompatActivity implements PermissionsListener {
+public class SelectedTrackActivity extends AppCompatActivity implements PermissionsListener {
 
     private MapView mapView;
     private MapboxMap map;
@@ -179,8 +178,10 @@ public class SelectedTrack extends AppCompatActivity implements PermissionsListe
                 .add(points)
                 .color(Color.RED)
                 .width(ROUTE_LINE_WIDTH);
-        map.addPolyline(routeLine);
-
+        if(map == null)
+            Toast.makeText(this, "Could not draw the route on the map", Toast.LENGTH_LONG).show();
+        else
+            map.addPolyline(routeLine);
     }
 
     public DirectionsRoute retrieveRouteFromJson(String route) {
@@ -220,18 +221,10 @@ public class SelectedTrack extends AppCompatActivity implements PermissionsListe
     }
 
 
-    private void showDefaultLocation() {
-        /*Showing the default position to the editor*/
-        double[] cameraPosValue = new double[5];
-        cameraPosValue[0] = DEFAULT_JERUSALEM_COORDINATE.getLatitude();
-        cameraPosValue[1] = DEFAULT_JERUSALEM_COORDINATE.getLongitude();
-        cameraPosValue[2] = 0;
-        cameraPosValue[3] = 0;
-        cameraPosValue[4] = 10;
-
-        CameraPosition.Builder cpBuilder = new CameraPosition.Builder(cameraPosValue);
-        CameraPosition tempPos = cpBuilder.build();
-        map.setCameraPosition(tempPos);
+    private void showDefaultLocation(){
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(DEFAULT_JERUSALEM_COORDINATE.getLatitude(),
+                        DEFAULT_JERUSALEM_COORDINATE.getLongitude()), 10));
     }
 
 
@@ -258,7 +251,7 @@ public class SelectedTrack extends AppCompatActivity implements PermissionsListe
             }
             Location lastLocation = locationEngine.getLastLocation();
             if (lastLocation != null) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), 16));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), ZOOM_LEVEL_CURRENT_LOCATION));
             }
 
             locationEngineListener = new LocationEngineListener() {
@@ -274,7 +267,7 @@ public class SelectedTrack extends AppCompatActivity implements PermissionsListe
                         // listener so the camera isn't constantly updating when the user location
                         // changes. When the user disables and then enables the location again, this
                         // listener is registered again and will adjust the camera once again.
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 16));
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), ZOOM_LEVEL_CURRENT_LOCATION));
                         locationEngine.removeLocationEngineListener(this);
                     }
                 }
@@ -292,12 +285,6 @@ public class SelectedTrack extends AppCompatActivity implements PermissionsListe
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-
-
-
-
-
-
 
 
 
@@ -349,33 +336,38 @@ public class SelectedTrack extends AppCompatActivity implements PermissionsListe
         Intent i;
         switch(item.getItemId()){
             case R.id.aboutActivity:
-                //i = new Intent(this, AboutUs.class);
-                //startActivity(i);
+                i = new Intent(this, AboutUsActivity.class);
+                startActivity(i);
                 return true;
 
             case R.id.contactUsActivity:
-                //i = new Intent(this, ContactUs.class);
-                //startActivity(i);
+                i = new Intent(this, ContactUsActivity.class);
+                startActivity(i);
                 return true;
 
             case R.id.homeActivity:
-                //i = new Intent(this, Home.class);
-                //startActivity(i);
-                return true;
-
-            case R.id.tracksActivity:
-                //i = new Intent(this, Tracks.class);
-                //startActivity(i);
+                i = new Intent(this, Home.class);
+                startActivity(i);
                 return true;
 
             case R.id.userGuideActivity:
-                //i = new Intent(this, UserGuide.class);
-                //startActivity(i);
+                i = new Intent(this, UserGuideActivity.class);
+                startActivity(i);
                 return true;
 
             case R.id.searchTracksActivity:
-                //i = new Intent(this, SearchTracksActivity.class);
-                //startActivity(i);
+                i = new Intent(this, AdvancedSearchTracksActivity.class);
+                startActivity(i);
+                return true;
+
+            case R.id.makeOwnTrackActivity:
+                i = new Intent(this, MakeOwnTrackActivity.class);
+                startActivity(i);
+                return true;
+
+            case R.id.tracksActivity:
+                i = new Intent(this, TracksActivity.class);
+                startActivity(i);
                 return true;
 
             default:

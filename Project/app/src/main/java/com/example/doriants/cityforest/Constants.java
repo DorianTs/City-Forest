@@ -41,5 +41,7 @@ public final class Constants {
     public static boolean FINISH_EDIT_TRACK_MODE = false;
 
     public static int ROUTE_LINE_WIDTH = 4;
+    public static int ZOOM_LEVEL_CURRENT_LOCATION = 13;
+    public static int RC_SIGN_IN = 1;
 
 }

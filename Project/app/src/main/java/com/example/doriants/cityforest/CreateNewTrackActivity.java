@@ -24,7 +24,7 @@ import static com.example.doriants.cityforest.Constants.CHOSEN_TRACK;
 import static com.example.doriants.cityforest.Constants.TRACK_CREATED;
 
 
-public class CreateNewTrack extends AppCompatActivity {
+public class CreateNewTrackActivity extends AppCompatActivity {
 
     private FirebaseDatabase database;
     private DatabaseReference tracks;
@@ -95,7 +95,7 @@ public class CreateNewTrack extends AppCompatActivity {
                 if(canSave){
                     writeNewTrack();
 
-                    Intent i = new Intent(CreateNewTrack.this, EditorPanelActivity.class);
+                    Intent i = new Intent(CreateNewTrackActivity.this, EditorPanelActivity.class);
                     setResult(TRACK_CREATED);
                     startActivity(i);
                 }

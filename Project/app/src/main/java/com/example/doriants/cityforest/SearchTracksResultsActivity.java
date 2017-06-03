@@ -78,7 +78,7 @@ public class SearchTracksResultsActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Track track = (Track) parent.getItemAtPosition(position);
 
-            Intent i = new Intent(SearchTracksResultsActivity.this, SelectedTrack.class);
+            Intent i = new Intent(SearchTracksResultsActivity.this, SelectedTrackActivity.class);
             i.putExtra(SELECTED_TRACK, track.getDb_key());
             startActivity(i);
         }
@@ -105,33 +105,38 @@ public class SearchTracksResultsActivity extends AppCompatActivity {
         Intent i;
         switch(item.getItemId()){
             case R.id.aboutActivity:
-                //i = new Intent(this, AboutUs.class);
-                //startActivity(i);
+                i = new Intent(this, AboutUsActivity.class);
+                startActivity(i);
                 return true;
 
             case R.id.contactUsActivity:
-                //i = new Intent(this, ContactUs.class);
-                //startActivity(i);
+                i = new Intent(this, ContactUsActivity.class);
+                startActivity(i);
                 return true;
 
             case R.id.homeActivity:
-                //i = new Intent(this, Home.class);
-                //startActivity(i);
-                return true;
-
-            case R.id.tracksActivity:
-                //i = new Intent(this, Tracks.class);
-                //startActivity(i);
+                i = new Intent(this, Home.class);
+                startActivity(i);
                 return true;
 
             case R.id.userGuideActivity:
-                //i = new Intent(this, UserGuide.class);
-                //startActivity(i);
+                i = new Intent(this, UserGuideActivity.class);
+                startActivity(i);
                 return true;
 
             case R.id.searchTracksActivity:
-                //i = new Intent(this, SearchTracksActivity.class);
-                //startActivity(i);
+                i = new Intent(this, AdvancedSearchTracksActivity.class);
+                startActivity(i);
+                return true;
+
+            case R.id.makeOwnTrackActivity:
+                i = new Intent(this, MakeOwnTrackActivity.class);
+                startActivity(i);
+                return true;
+
+            case R.id.tracksActivity:
+                i = new Intent(this, TracksActivity.class);
+                startActivity(i);
                 return true;
 
             default:

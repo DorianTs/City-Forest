@@ -8,9 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -22,6 +20,7 @@ import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -31,7 +30,6 @@ import com.mapbox.services.commons.geojson.LineString;
 import com.mapbox.services.commons.models.Position;
 import com.mapbox.services.directions.v5.models.DirectionsRoute;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -72,55 +70,6 @@ public class EditTracksActivity extends AppCompatActivity {
         track_list.setAdapter(adapter);
     }
 
-    private void getAllTracksFromDb(final TracksAdapter adapter) {
-       /*Reading one time from the database, we get the tracks map list*/
-       tracks.addListenerForSingleValueEvent(new ValueEventListener() {
-           @Override
-           public void onDataChange(DataSnapshot dataSnapshot) {
-               Map<String, Object> tracksMap = (Map<String, Object>)dataSnapshot.getValue();
-               if(tracksMap == null)
-                   return;
-
-               /*Iterating all the tracks in the list and adding them to the dedicated array list*/
-               for (Map.Entry<String, Object> entry : tracksMap.entrySet()) {
-                   Track track = convertMapToTrack(entry);
-                   //adapter.add(track);
-               }
-           }
-
-           @Override
-           public void onCancelled(DatabaseError databaseError) {
-           }
-       });
-    }
-
-    private Track convertMapToTrack(Map.Entry<String, Object> entry) {
-        Map<String, Object> trackMap = ((Map<String, Object>) entry.getValue());
-
-        double duration = (double)trackMap.get("duration");
-        double length = (double)trackMap.get("length");
-        boolean has_water = (boolean)trackMap.get("has_water");
-        boolean suitable_for_bikes = (boolean)trackMap.get("suitable_for_bikes");
-        boolean suitable_for_dogs = (boolean)trackMap.get("suitable_for_dogs");
-        boolean suitable_for_families = (boolean)trackMap.get("suitable_for_families");
-        boolean is_romantic = (boolean)trackMap.get("is_romantic");
-
-        return new Track((String)trackMap.get("route"),
-                (String)trackMap.get("key"),
-                (String)trackMap.get("track_name"),
-                (String)trackMap.get("starting_point"),
-                (String)trackMap.get("ending_point"),
-                duration,
-                length,
-                (String)trackMap.get("level"),
-                (String)trackMap.get("season"),
-                has_water,
-                suitable_for_bikes,
-                suitable_for_dogs,
-                suitable_for_families,
-                is_romantic,
-                (String)trackMap.get("additional_info"));
-    }
 
     private class myOnMapReadyCallback implements OnMapReadyCallback {
         @Override
@@ -159,7 +108,7 @@ public class EditTracksActivity extends AppCompatActivity {
                             break;
                         }
                         case 1:{ // edit the track
-                            Intent i = new Intent(EditTracksActivity.this, EditTrack.class);
+                            Intent i = new Intent(EditTracksActivity.this, EditTrackActivity.class);
                             i.putExtra(TRACK_EDIT, track.getDb_key());
                             EditTracksActivity.this.startActivity(i);
                             break;
@@ -208,17 +157,9 @@ public class EditTracksActivity extends AppCompatActivity {
     }
 
     private void showDefaultLocation(){
-        /*Showing the default position to the editor*/
-        double[] cameraPosValue = new double[5];
-        cameraPosValue[0] = DEFAULT_JERUSALEM_COORDINATE.getLatitude();
-        cameraPosValue[1] = DEFAULT_JERUSALEM_COORDINATE.getLongitude();
-        cameraPosValue[2] = 0;
-        cameraPosValue[3] = 0;
-        cameraPosValue[4] = 10;
-
-        CameraPosition.Builder cpBuilder = new CameraPosition.Builder(cameraPosValue);
-        CameraPosition tempPos = cpBuilder.build();
-        map.setCameraPosition(tempPos);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(DEFAULT_JERUSALEM_COORDINATE.getLatitude(),
+                        DEFAULT_JERUSALEM_COORDINATE.getLongitude()), 10));
     }
 
     private void dialogDeleteTrack(final String key){
@@ -238,6 +179,12 @@ public class EditTracksActivity extends AppCompatActivity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent i = new Intent(EditTracksActivity.this, EditorPanelActivity.class);
+        startActivity(i);
     }
 
 

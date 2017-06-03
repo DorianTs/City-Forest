@@ -12,15 +12,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.Map;
 
 import static com.example.doriants.cityforest.Constants.COORDINATE_CREATED;
 import static com.example.doriants.cityforest.Constants.COORDINATE_KEY;
-import static com.example.doriants.cityforest.R.id.saveButt;
 
-public class EditCoordinate extends AppCompatActivity {
+public class EditCoordinateActivity extends AppCompatActivity {
 
     private static final String TAG = "db_on_change";
     private FirebaseDatabase database;
@@ -58,7 +56,7 @@ public class EditCoordinate extends AppCompatActivity {
             if(v.getId() == updateButt.getId()){
                 updateDatabase();
 
-                Intent i = new Intent(EditCoordinate.this, EditorPanelActivity.class);
+                Intent i = new Intent(EditCoordinateActivity.this, EditorPanelActivity.class);
                 setResult(COORDINATE_CREATED);
                 startActivity(i);
             }

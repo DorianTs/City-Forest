@@ -1,35 +1,25 @@
 package com.example.doriants.cityforest;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.doriants.cityforest.Constants.CHOSEN_COORDINATE;
 import static com.example.doriants.cityforest.Constants.COORDINATE_CREATED;
-import static com.example.doriants.cityforest.Constants.IS_COORDINATE_MAP_CREATED;
-import static com.example.doriants.cityforest.Constants.NEW_COORDINATE_ID;
 
-public class CreateNewCoordinate extends AppCompatActivity {
+public class CreateNewCoordinateActivity extends AppCompatActivity {
 
     private static final String TAG = "db_on_change";
     private FirebaseDatabase database;
@@ -65,7 +55,7 @@ public class CreateNewCoordinate extends AppCompatActivity {
             if(v.getId() == saveButt.getId()){
                 writeNewCoordinate();
 
-                Intent i = new Intent(CreateNewCoordinate.this, EditorPanelActivity.class);
+                Intent i = new Intent(CreateNewCoordinateActivity.this, EditorPanelActivity.class);
                 setResult(COORDINATE_CREATED);
                 startActivity(i);
             }

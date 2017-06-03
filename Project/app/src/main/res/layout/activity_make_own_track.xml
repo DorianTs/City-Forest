@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:id="@+id/editor_layout"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:orientation="vertical"
+android:weightSum="1"
+tools:context="com.example.doriants.cityforest.MakeOwnTrackActivity">
+
+
+<RelativeLayout
+    android:id="@+id/mapLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="UselessParent">
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/location_toggle_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="16dp"
+            app:backgroundTint="@color/colorPrimary"
+            app:srcCompat="@drawable/ic_my_location_24dp"
+            tools:ignore="VectorDrawableCompat" />
+
+        <ImageView
+            android:id="@+id/smallLogo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/cityforest_logo"
+            app:srcCompat="@drawable/cf_small_logo" />
+
+        <TextView
+            android:id="@+id/counterCoordinates"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/finishEditTrack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="25dp"
+            android:text="@string/finish_editing_track_butt" />
+
+        <Button
+            android:id="@+id/continueEditTrack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="25dp"
+            android:text="@string/continue_edit_butt"
+            tools:ignore="RtlHardcoded" />
+
+        <GridLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:columnCount="1">
+
+            <ImageButton
+                android:id="@+id/addTrackButt"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:background="@android:drawable/btn_default"
+                android:contentDescription="@string/add_track_button"
+                app:srcCompat="@mipmap/ic_timeline_black_48dp" />
+
+        </GridLayout>
+
+    </com.mapbox.mapboxsdk.maps.MapView>
+
+</RelativeLayout>
+</LinearLayout>

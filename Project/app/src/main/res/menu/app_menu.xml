@@ -1,31 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:tools="http://schemas.android.com/tools"
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="@string/menu_home"
         android:id="@+id/homeActivity"
-        android:showAsAction="always"
-        tools:ignore="AppCompatResource"
-        android:visible="true" />
-    <item
-        android:title="@string/menu_tracks"
-        android:id="@+id/tracksActivity"/>
+        android:icon="@mipmap/ic_home_white_48dp"
+        android:showAsAction="ifRoom"
+        android:title="@string/menu_home"
+        android:visible="true"
+        app:showAsAction="ifRoom"
+        tools:ignore="AppCompatResource" />
 
     <item
+        android:id="@+id/signOut"
+        android:icon="@mipmap/ic_power_settings_new_white_48dp"
+        android:title="@string/sign_out_action"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+
+    <group>
+
+        <item
         android:title="@string/menu_adv_search"
         android:id="@+id/searchTracksActivity" />
-    <item
-        android:title="@string/menu_user_guide"
-        android:id="@+id/userGuideActivity"/>
 
-    <item
-        android:title="@string/menu_contact_us"
-        android:id="@+id/contactUsActivity" />
+        <item
+            android:id="@+id/tracksActivity"
+            android:title="@string/tracks_menu" />
 
-    <item
-        android:title="@string/menu_about_us"
-        android:id="@+id/aboutActivity" />
+        <item
+            android:id="@+id/makeOwnTrackActivity"
+            android:title="@string/Make_own_track_menu" />
+        </group>
+
+    <group>
+        <item
+            android:title="@string/menu_user_guide"
+            android:id="@+id/userGuideActivity"/>
+
+        <item
+            android:title="@string/menu_contact_us"
+            android:id="@+id/contactUsActivity" />
+
+        <item
+            android:title="@string/menu_about_us"
+            android:id="@+id/aboutActivity" />
+
+    </group>
 
 
 </menu>

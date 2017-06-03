@@ -9,32 +9,82 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/cf_small_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
 
         <activity
-            android:name=".CreateNewCoordinate"
+            android:name=".CreateNewCoordinateActivity"
             android:label="New Coordinate" />
-        <activity android:name=".EditorPanelActivity"></activity>
+
         <activity
-            android:name=".EditCoordinate"
+            android:name=".EditorPanelActivity"
+            android:label="Editor Panel"/>
+
+        <activity
+            android:name=".EditCoordinateActivity"
             android:label="Edit Coordinate" />
-        <activity android:name=".CreateNewTrack" />
-        <activity android:name=".EditTracksActivity" />
-        <activity android:name=".EditTrack" />
-        <activity android:name=".Home">
+
+        <activity
+            android:name=".CreateNewTrackActivity"
+            android:label="New Track"/>
+
+        <activity
+            android:name=".EditTracksActivity"
+            android:label="Edit Tracks"/>
+
+        <activity
+            android:name=".EditTrackActivity"
+            android:label="Edit Track"/>
+
+        <activity android:name=".Home" />
+
+        <activity
+            android:name=".AdvancedSearchTracksActivity"
+            android:label="חיפוש מתקדם"/>
+
+        <activity
+            android:name=".SearchTracksResultsActivity"
+            android:label="תוצאות חיפוש"/>
+
+        <activity
+            android:name=".SelectedTrackActivity" />
+
+        <activity
+            android:name=".MakeOwnTrackActivity"
+            android:label="יצירת מסלול חדש"/>
+
+        <activity
+            android:name=".AboutUsActivity"
+            android:label="אודות"/>
+
+        <activity
+            android:name=".ContactUsActivity"
+            android:label="צור קשר"/>
+
+        <activity
+            android:name=".UserGuideActivity"
+            android:label="מדריך למשתמש"/>
+
+        <activity
+            android:name=".TracksActivity"
+            android:label="רשימת מסלולים"/>
+
+        <activity
+            android:name=".SignInActivity"
+            android:label="עיר יער">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AdvancedSearchTracksActivity" />
-        <activity android:name=".SearchTracksResultsActivity" />
-        <activity android:name=".SelectedTrack"></activity>
+
+        <activity
+            android:name=".EditorHomeActivity"
+            android:label=""/>
     </application>
 
 </manifest>
