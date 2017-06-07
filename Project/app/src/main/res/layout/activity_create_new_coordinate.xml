@@ -33,33 +33,67 @@
         android:layout_marginTop="20dp" />
 
     <EditText
+        android:id="@+id/SummaryField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
         android:ems="10"
-        android:id="@+id/SummaryField"
+        android:inputType="textPersonName"
         tools:ignore="LabelFor" />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
 
-        <Button
-            android:text="@string/save_butt"
+        <TextView
+            android:id="@+id/isPointOfInterestTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/saveButt"
             android:layout_weight="1"
-            tools:ignore="ButtonStyle" />
+            android:text="@string/point_of_interest_txt" />
+
+        <CheckBox
+            android:id="@+id/isPointOfInterestCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <Spinner
+        android:id="@+id/typeOfPoint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/cancelButt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="@string/cancel_butt"
             tools:ignore="ButtonOrder,ButtonStyle,RtlHardcoded" />
+
+        <Button
+            android:id="@+id/saveButt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1"
+            android:text="@string/save_butt"
+            tools:ignore="ButtonStyle" />
     </LinearLayout>
 </LinearLayout>

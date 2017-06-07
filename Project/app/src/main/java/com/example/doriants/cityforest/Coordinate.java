@@ -10,9 +10,9 @@ import java.util.Map;
 
 public class Coordinate {
 
-    private Position pos = null;
-    private String title;
-    private String snippet;
+    protected Position pos = null;
+    protected String title;
+    protected String snippet;
 
 
     public Coordinate(){

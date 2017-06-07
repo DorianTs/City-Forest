@@ -1,6 +1,7 @@
 package com.example.doriants.cityforest;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,6 +31,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -93,6 +95,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
     private PolylineOptions routeLine;
     private FirebaseDatabase database;
     private DatabaseReference coordinates;
+    private DatabaseReference points_of_interest;
     private ImageButton add_coordinate_button;
     private ImageButton delete_coordinate_button;
     private ImageButton edit_coordinate_button;
@@ -134,6 +137,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
 
         database = FirebaseDatabase.getInstance();
         coordinates = database.getReference("coordinates");
+        points_of_interest = database.getReference("points_of_interest");
 
         /*Buttons for different edit map modes*/
         add_coordinate_button = (ImageButton)findViewById(R.id.addCoordinateButt);
@@ -302,26 +306,55 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                     return;
                 }
 
-                //here we turn off ADD_TRACK_MODE
-                ADD_TRACK_MODE = false;
-                add_track_button.setClickable(false);
-                FINISH_EDIT_TRACK_MODE = true;
-                finish_edit_track_butt.setVisibility(View.INVISIBLE);
-                save_track.setVisibility(View.VISIBLE);
-                continue_editing.setVisibility(View.VISIBLE);
+                final String last_marker_key = getMarkerHashKey(track_markers.get(track_markers.size()-1));
+                points_of_interest.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Map<String, Object> pointsMap = (Map<String, Object>)dataSnapshot.getValue();
+                        if(pointsMap == null) {
+                            Toast.makeText(EditorPanelActivity.this, R.string.toast_ending_point, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        Map<String, Object> point = ((Map<String, Object>)pointsMap.get(last_marker_key));
 
-                try {
-                    getRoute();
-                } catch (ServicesException servicesException) {
-                    servicesException.printStackTrace();
-                }
+                        if(point == null){
+                            Toast.makeText(EditorPanelActivity.this, R.string.toast_ending_point, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                LatLngBounds latLngBounds = new LatLngBounds.Builder()
-                        .include(track_markers.get(0).getPosition())
-                        .include(track_markers.get(track_markers.size()-1).getPosition())
-                        .build();
+                        String type = (String)point.get("type");
+                        if(! type.equals("תחנת רכבת")){
+                            Toast.makeText(EditorPanelActivity.this, R.string.toast_ending_point, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                map.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 100);
+                        //here we turn off ADD_TRACK_MODE
+                        ADD_TRACK_MODE = false;
+                        add_track_button.setClickable(false);
+                        FINISH_EDIT_TRACK_MODE = true;
+                        finish_edit_track_butt.setVisibility(View.INVISIBLE);
+                        save_track.setVisibility(View.VISIBLE);
+                        continue_editing.setVisibility(View.VISIBLE);
+
+                        try {
+                            getRoute();
+                        } catch (ServicesException servicesException) {
+                            servicesException.printStackTrace();
+                        }
+
+                        LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                                .include(track_markers.get(0).getPosition())
+                                .include(track_markers.get(track_markers.size()-1).getPosition())
+                                .build();
+
+                        map.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 100);
+
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
             }
             if(v.getId() == continue_editing.getId()){
                 //here we turn on ADD_TRACK_MODE
@@ -355,7 +388,42 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
             map.setStyleUrl(Style.OUTDOORS);
             showDefaultLocation();
             showAllCoordinates();
+            showAllPointsOfInterest();
         }
+    }
+
+    private void showAllPointsOfInterest() {
+        /*Reading one time from the database, we get the points of interest map list*/
+        points_of_interest.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> pointsMap = (Map<String, Object>)dataSnapshot.getValue();
+                if(pointsMap == null)
+                    return;
+                /*Iterating all the coordinates in the list*/
+                for (Map.Entry<String, Object> entry : pointsMap.entrySet())
+                {
+                    /*For each coordinate in the database, we want to create a new marker
+                    * for it and to show the marker on the map*/
+                    Map<String, Object> point = ((Map<String, Object>) entry.getValue());
+                    /*Now the object 'cor' holds a *map* for a specific coordinate*/
+                    String positionJSON = (String) point.get("position");
+                    Position position = retrievePositionFromJson(positionJSON);
+
+                    /*Creating the marker on the map*/
+                    LatLng latlng = new LatLng(
+                            position.getLongitude(),
+                            position.getLatitude());
+
+                    long logo = (long)point.get("logo");
+                    addMarkerForPointOfInterest(latlng, (String)point.get("title"), (String)point.get("snippet"), (int) logo);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+
+        });
     }
 
     private void showAllCoordinates() {
@@ -364,8 +432,10 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Map<String, Object> coordinatesMap = (Map<String, Object>)dataSnapshot.getValue();
-                if(coordinatesMap == null)
-                   return;
+                if(coordinatesMap == null){
+                    return;
+                }
+
                 /*Iterating all the coordinates in the list*/
                 for (Map.Entry<String, Object> entry : coordinatesMap.entrySet())
                 {
@@ -382,12 +452,14 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                             position.getLatitude());
                     addMarkerForCoordinate(latlng, (String)cor.get("title"), (String)cor.get("snippet"));
                 }
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {}
 
         });
+
 
     }
 
@@ -476,20 +548,27 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
             * in the database for this specific location*/
 
             if(ADD_TRACK_MODE && count_coordinates_selected < MAX_NUM_OF_TRACK_COORDINATES) {
-                writeGenericCoordinateToDB(point);
-                MarkerView marker = addMarkerForCoordinate(point, "", "");
-                IconFactory iconFactory = IconFactory.getInstance(EditorPanelActivity.this);
-                Icon icon = iconFactory.fromResource(R.drawable.blue_marker);
-                marker.setIcon(icon);
+                if(count_coordinates_selected == 0){
+                    Toast.makeText(EditorPanelActivity.this, R.string.toast_starting_point, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                else{
+                    writeGenericCoordinateToDB(point);
+                    MarkerView marker = addMarkerForCoordinate(point, "", "");
+                    IconFactory iconFactory = IconFactory.getInstance(EditorPanelActivity.this);
+                    Icon icon = iconFactory.fromResource(R.drawable.blue_marker);
+                    marker.setIcon(icon);
 
 
-                track_coordinates.add(point.getLongitude());
-                track_coordinates.add(point.getLatitude());
-                track_markers.add(marker);
-                Position temp = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
-                track_positions.add(temp);
-                count_coordinates_selected++;
-                updateScreenCounter();
+                    track_coordinates.add(point.getLongitude());
+                    track_coordinates.add(point.getLatitude());
+                    track_markers.add(marker);
+                    Position temp = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
+                    track_positions.add(temp);
+                    count_coordinates_selected++;
+                    updateScreenCounter();
+                }
+
             }
             else if(ADD_TRACK_MODE && count_coordinates_selected >= MAX_NUM_OF_TRACK_COORDINATES){
                 Toast.makeText(EditorPanelActivity.this, R.string.reached_limit_of_coordinates, Toast.LENGTH_SHORT).show();
@@ -504,6 +583,21 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                 .title(title)
                 .snippet(snippet);
         map.addMarker(markerViewOptions);
+        return markerViewOptions.getMarker();
+    }
+
+    private MarkerView addMarkerForPointOfInterest(LatLng point, String title, String snippet, int logo){
+        MarkerViewOptions markerViewOptions = new MarkerViewOptions()
+                .position(point)
+                .title(title)
+                .snippet(snippet);
+        map.addMarker(markerViewOptions);
+
+        if(logo != -1) {
+            IconFactory iconFactory = IconFactory.getInstance(EditorPanelActivity.this);
+            Icon icon = iconFactory.fromResource(logo);
+            markerViewOptions.getMarker().setIcon(icon);
+        }
         return markerViewOptions.getMarker();
     }
 
@@ -530,7 +624,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
     /*Marker clicked listener. We can delete/edit a coordinate*/
     private class MyOnMarkerClickListener implements MapboxMap.OnMarkerClickListener{
         @Override
-        public boolean onMarkerClick(@NonNull Marker marker) {
+        public boolean onMarkerClick(@NonNull final Marker marker) {
 
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(marker.getPosition().getLatitude(),
                     marker.getPosition().getLongitude()), 16));
@@ -543,10 +637,11 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                 dialogEditCoordinate(marker);
                 return true;
             }
-            if(ADD_TRACK_MODE){
+
+            if(ADD_TRACK_MODE) {
                 for(int i=0; i<track_markers.size(); i++) {
-                    /*If the editor clicked a marker that is already part of the track
-                     * we want to remove it from the track coordinates array*/
+                            /*If the editor clicked a marker that is already part of the track
+                            * we want to remove it from the track coordinates array*/
                     if(track_markers.get(i).toString().equals(marker.toString())){
                         track_coordinates.remove(marker.getPosition().getLongitude());
                         track_coordinates.remove(marker.getPosition().getLatitude());
@@ -565,7 +660,56 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                 * that's why we need to add him now to the track coordinates*/
                 if(count_coordinates_selected >= MAX_NUM_OF_TRACK_COORDINATES){
                     Toast.makeText(EditorPanelActivity.this, R.string.reached_limit_of_coordinates, Toast.LENGTH_SHORT).show();
-                    return false;
+                    return true;
+                }
+
+                /*We want to make sure that the first chosen coordinate is train station*/
+                if(count_coordinates_selected == 0){
+                    final String key = getMarkerHashKey(marker);
+                    points_of_interest.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Map<String, Object> pointsMap = (Map<String, Object>)dataSnapshot.getValue();
+                            if(pointsMap == null) {
+                                Toast.makeText(EditorPanelActivity.this, R.string.toast_starting_point, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            Map<String, Object> point = ((Map<String, Object>)pointsMap.get(key));
+
+
+                            if(point == null){
+                                Toast.makeText(EditorPanelActivity.this, R.string.toast_starting_point, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            String type = (String)point.get("type");
+                            if(! type.equals("תחנת רכבת")){
+                                Toast.makeText(EditorPanelActivity.this, R.string.toast_starting_point, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            IconFactory iconFactory = IconFactory.getInstance(EditorPanelActivity.this);
+                            Icon icon = iconFactory.fromResource(R.drawable.blue_marker);
+
+                            track_coordinates.add(marker.getPosition().getLongitude());
+                            track_coordinates.add(marker.getPosition().getLatitude());
+                            track_markers.add(marker);
+                            Position temp = Position.fromCoordinates(marker.getPosition().getLongitude(), marker.getPosition().getLatitude());
+                            track_positions.add(temp);
+                            count_coordinates_selected++;
+                            updateScreenCounter();
+
+
+                            marker.setIcon(icon);
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
                 else{
                     IconFactory iconFactory = IconFactory.getInstance(EditorPanelActivity.this);
@@ -578,11 +722,14 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                     track_positions.add(temp);
                     count_coordinates_selected++;
                     updateScreenCounter();
+
+
                     marker.setIcon(icon);
                     return true;
                 }
 
             }
+
             return false;
         }
     }
@@ -656,6 +803,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
     private void deleteCoordinateFromDb(final Marker marker) {
         String key = getMarkerHashKey(marker);
         coordinates.child(key).removeValue();
+        points_of_interest.child(key).removeValue();
         map.removeMarker(marker);
     }
 

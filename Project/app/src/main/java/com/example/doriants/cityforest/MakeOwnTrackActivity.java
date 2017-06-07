@@ -83,6 +83,7 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
     private DirectionsRoute currentRoute;
     private FirebaseDatabase database;
     private DatabaseReference coordinates;
+    private DatabaseReference points_of_interest;
 
     private FloatingActionButton floatingActionButton;
     private LocationEngine locationEngine;
@@ -119,6 +120,7 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
 
         database = FirebaseDatabase.getInstance();
         coordinates = database.getReference("coordinates");
+        points_of_interest = database.getReference("points_of_interest");
 
         add_track_button = (ImageButton)findViewById(R.id.addTrackButt);
         finish_edit_track_butt = (Button)findViewById(R.id.finishEditTrack);
@@ -245,36 +247,11 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
         @Override
         public void onMapReady(MapboxMap mapboxMap) {
             map = mapboxMap;
-            map.setOnMapClickListener(new MyOnMapClickListener());
             map.setOnMarkerClickListener(new MyOnMarkerClickListener());
             map.setStyleUrl(Style.OUTDOORS);
             showDefaultLocation();
             showAllCoordinates();
-        }
-    }
-
-    private class MyOnMapClickListener implements MapboxMap.OnMapClickListener{
-        @Override
-        public void onMapClick(@NonNull LatLng point) {
-            if(ADD_TRACK_MODE && count_coordinates_selected < MAX_NUM_OF_TRACK_COORDINATES) {
-                MarkerView marker = addMarkerForCoordinate(point, "", "");
-                IconFactory iconFactory = IconFactory.getInstance(MakeOwnTrackActivity.this);
-                Icon icon = iconFactory.fromResource(R.drawable.blue_marker);
-                marker.setIcon(icon);
-
-
-                track_coordinates.add(point.getLongitude());
-                track_coordinates.add(point.getLatitude());
-                track_markers.add(marker);
-                Position temp = Position.fromCoordinates(point.getLongitude(), point.getLatitude());
-                track_positions.add(temp);
-                count_coordinates_selected++;
-                updateScreenCounter();
-            }
-            else if(ADD_TRACK_MODE && count_coordinates_selected >= MAX_NUM_OF_TRACK_COORDINATES){
-                Toast.makeText(MakeOwnTrackActivity.this, R.string.reached_limit_of_coordinates, Toast.LENGTH_SHORT).show();
-            }
-
+            showAllPointsOfInterest();
         }
     }
 
@@ -400,6 +377,40 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
 
     }
 
+    private void showAllPointsOfInterest() {
+        /*Reading one time from the database, we get the points of interest map list*/
+        points_of_interest.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> pointsMap = (Map<String, Object>)dataSnapshot.getValue();
+                if(pointsMap == null)
+                    return;
+                /*Iterating all the coordinates in the list*/
+                for (Map.Entry<String, Object> entry : pointsMap.entrySet())
+                {
+                    /*For each coordinate in the database, we want to create a new marker
+                    * for it and to show the marker on the map*/
+                    Map<String, Object> point = ((Map<String, Object>) entry.getValue());
+                    /*Now the object 'cor' holds a *map* for a specific coordinate*/
+                    String positionJSON = (String) point.get("position");
+                    Position position = retrievePositionFromJson(positionJSON);
+
+                    /*Creating the marker on the map*/
+                    LatLng latlng = new LatLng(
+                            position.getLongitude(),
+                            position.getLatitude());
+
+                    long logo = (long)point.get("logo");
+                    addMarkerForPointOfInterest(latlng, (String)point.get("title"), (String)point.get("snippet"), (int) logo);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+
+        });
+    }
+
     private void showAllCoordinates() {
         /*Reading one time from the database, we get the coordinates map list*/
         coordinates.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -450,6 +461,21 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
                 .title(title)
                 .snippet(snippet);
         map.addMarker(markerViewOptions);
+        return markerViewOptions.getMarker();
+    }
+
+    private MarkerView addMarkerForPointOfInterest(LatLng point, String title, String snippet, int logo){
+        MarkerViewOptions markerViewOptions = new MarkerViewOptions()
+                .position(point)
+                .title(title)
+                .snippet(snippet);
+        map.addMarker(markerViewOptions);
+
+        if(logo != -1) {
+            IconFactory iconFactory = IconFactory.getInstance(MakeOwnTrackActivity.this);
+            Icon icon = iconFactory.fromResource(logo);
+            markerViewOptions.getMarker().setIcon(icon);
+        }
         return markerViewOptions.getMarker();
     }
 

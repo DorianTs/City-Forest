@@ -17,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.LocationSource;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -25,6 +26,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.MapboxAccountManager;
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.MarkerView;
+import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
@@ -55,12 +60,14 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
     private MapboxMap map;
     private FirebaseDatabase database;
     private DatabaseReference tracks;
+    private DatabaseReference points_of_interest;
     private String track_db_key;
 
     private FloatingActionButton floatingActionButton;
     private LocationEngine locationEngine;
     private LocationEngineListener locationEngineListener;
     private PermissionsManager permissionsManager;
+
 
     private TextView track_name_field;
     private TextView starting_point_field;
@@ -92,6 +99,7 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
 
         database = FirebaseDatabase.getInstance();
         tracks = database.getReference("tracks");
+        points_of_interest = database.getReference("points_of_interest");
 
         Intent i = getIntent();
         track_db_key = i.getStringExtra(SELECTED_TRACK);
@@ -178,7 +186,7 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
                 .add(points)
                 .color(Color.RED)
                 .width(ROUTE_LINE_WIDTH);
-        if(map == null)
+        if (map == null)
             Toast.makeText(this, "Could not draw the route on the map", Toast.LENGTH_LONG).show();
         else
             map.addPolyline(routeLine);
@@ -193,38 +201,81 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
         return obj;
     }
 
-    @Override
-    public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(this, "This app needs location permissions in order to show its functionality.",
-                Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void onPermissionResult(boolean granted) {
-        if (granted) {
-            enableLocation(true);
-        } else {
-            Toast.makeText(this, "You didn't grant location permissions.",
-                    Toast.LENGTH_LONG).show();
-            finish();
-        }
-    }
-
-
     private class myOnMapReadyCallback implements OnMapReadyCallback {
         @Override
         public void onMapReady(MapboxMap mapboxMap) {
             map = mapboxMap;
             map.setStyleUrl(Style.OUTDOORS);
             showDefaultLocation();
+            showAllPointsOfInterest();
         }
     }
 
 
-    private void showDefaultLocation(){
+    private void showDefaultLocation() {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
                 new LatLng(DEFAULT_JERUSALEM_COORDINATE.getLatitude(),
                         DEFAULT_JERUSALEM_COORDINATE.getLongitude()), 10));
+    }
+
+    private void showAllPointsOfInterest() {
+        /*Reading one time from the database, we get the points of interest map list*/
+        points_of_interest.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> pointsMap = (Map<String, Object>)dataSnapshot.getValue();
+                if(pointsMap == null)
+                    return;
+                /*Iterating all the coordinates in the list*/
+                for (Map.Entry<String, Object> entry : pointsMap.entrySet())
+                {
+                    /*For each coordinate in the database, we want to create a new marker
+                    * for it and to show the marker on the map*/
+                    Map<String, Object> point = ((Map<String, Object>) entry.getValue());
+                    /*Now the object 'cor' holds a *map* for a specific coordinate*/
+                    String positionJSON = (String) point.get("position");
+                    Position position = retrievePositionFromJson(positionJSON);
+
+                    /*Creating the marker on the map*/
+                    LatLng latlng = new LatLng(
+                            position.getLongitude(),
+                            position.getLatitude());
+
+                    long logo = (long)point.get("logo");
+                    addMarkerForPointOfInterest(latlng, (String)point.get("title"), (String)point.get("snippet"), (int) logo);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+
+        });
+    }
+
+    private MarkerView addMarkerForPointOfInterest(LatLng point, String title, String snippet, int logo){
+        MarkerViewOptions markerViewOptions = new MarkerViewOptions()
+                .position(point)
+                .title(title)
+                .snippet(snippet);
+        map.addMarker(markerViewOptions);
+
+        if(logo != -1) {
+            IconFactory iconFactory = IconFactory.getInstance(SelectedTrackActivity.this);
+            Icon icon = iconFactory.fromResource(logo);
+            markerViewOptions.getMarker().setIcon(icon);
+        }
+        return markerViewOptions.getMarker();
+    }
+
+    /*Method get String that represents a Position Json object.
+    * Method retrieve the position object and returns it*/
+    public Position retrievePositionFromJson(String posJs) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        Position obj = gson.fromJson(posJs, Position.class);
+        return obj;
     }
 
 
@@ -247,11 +298,18 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
         if (enabled) {
             // If we have the last location of the user, we can move the camera to that position.
             if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
                 return;
             }
             Location lastLocation = locationEngine.getLastLocation();
             if (lastLocation != null) {
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), ZOOM_LEVEL_CURRENT_LOCATION));
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), 16));
             }
 
             locationEngineListener = new LocationEngineListener() {
@@ -267,7 +325,7 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
                         // listener so the camera isn't constantly updating when the user location
                         // changes. When the user disables and then enables the location again, this
                         // listener is registered again and will adjust the camera once again.
-                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), ZOOM_LEVEL_CURRENT_LOCATION));
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 16));
                         locationEngine.removeLocationEngineListener(this);
                     }
                 }
@@ -281,10 +339,30 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
         map.setMyLocationEnabled(enabled);
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(this, "This app needs location permissions in order to show its functionality.",
+                Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocation(true);
+        } else {
+            Toast.makeText(this, "You didn't grant location permissions.",
+                    Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+
 
 
 

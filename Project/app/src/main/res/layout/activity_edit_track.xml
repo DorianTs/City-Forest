@@ -300,14 +300,6 @@ android:weightSum="1">
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/updateButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/update_button"
-            tools:ignore="ButtonStyle" />
-
-        <Button
             android:id="@+id/cancelButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -315,6 +307,15 @@ android:weightSum="1">
             android:layout_weight="1"
             android:text="@string/cancel_butt"
             tools:ignore="ButtonOrder,ButtonStyle,RtlHardcoded" />
+
+        <Button
+            android:id="@+id/updateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/update_button"
+            tools:ignore="ButtonStyle" />
+
     </LinearLayout>
 
 </LinearLayout>
