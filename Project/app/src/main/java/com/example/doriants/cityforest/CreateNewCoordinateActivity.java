@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static com.example.doriants.cityforest.Constants.CHOSEN_COORDINATE;
 import static com.example.doriants.cityforest.Constants.COORDINATE_CREATED;
+import static com.example.doriants.cityforest.Constants.CREATED_COORDINATE_FOR_ZOOM;
 
 public class CreateNewCoordinateActivity extends AppCompatActivity {
 
@@ -102,9 +103,11 @@ public class CreateNewCoordinateActivity extends AppCompatActivity {
                 else
                     writeNewCoordinate();
 
-                Intent i = new Intent(CreateNewCoordinateActivity.this, EditorPanelActivity.class);
-                setResult(COORDINATE_CREATED);
-                startActivity(i);
+
+                Intent intent = getIntent();
+                intent.putExtra(CREATED_COORDINATE_FOR_ZOOM, castLatLngToJson(chosenCoordinateLatLng));
+                setResult(COORDINATE_CREATED, intent);
+                finish();
             }
             // else, go back to last page you came from
             if(v.getId() == cancelButt.getId()){
@@ -134,6 +137,15 @@ public class CreateNewCoordinateActivity extends AppCompatActivity {
         Gson gson = gsonBuilder.create();
         LatLng obj = gson.fromJson(stringExtra, LatLng.class);
         return obj;
+    }
+
+    private String castLatLngToJson(LatLng coordinate) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        String json = gson.toJson(coordinate, LatLng.class);
+        return json;
     }
 
 

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -75,9 +76,14 @@ import static com.example.doriants.cityforest.Constants.ADD_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.ADD_TRACK_MODE;
 import static com.example.doriants.cityforest.Constants.CHOSEN_COORDINATE;
 import static com.example.doriants.cityforest.Constants.CHOSEN_TRACK;
+import static com.example.doriants.cityforest.Constants.COORDINATE_CREATED;
+import static com.example.doriants.cityforest.Constants.COORDINATE_EDITED;
 import static com.example.doriants.cityforest.Constants.COORDINATE_KEY;
+import static com.example.doriants.cityforest.Constants.CREATED_COORDINATE_FOR_ZOOM;
 import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDINATE;
 import static com.example.doriants.cityforest.Constants.DELETE_COORDINATE_MODE;
+import static com.example.doriants.cityforest.Constants.EDITED_COORDINATE_FOR_ZOOM;
+import static com.example.doriants.cityforest.Constants.EDIT_COORDINATE;
 import static com.example.doriants.cityforest.Constants.EDIT_COORDINATE_MODE;
 import static com.example.doriants.cityforest.Constants.FINISH_EDIT_TRACK_MODE;
 import static com.example.doriants.cityforest.Constants.MAX_NUM_OF_TRACK_COORDINATES;
@@ -85,6 +91,7 @@ import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 import static com.example.doriants.cityforest.Constants.NEW_TRACK;
 import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
 import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_CURRENT_LOCATION;
+import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_MARKER_CLICK;
 import static com.mapbox.services.android.telemetry.location.AndroidLocationEngine.getLocationEngine;
 
 public class EditorPanelActivity extends AppCompatActivity implements PermissionsListener {
@@ -119,6 +126,8 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
 
     private GoogleApiClient mGoogleApiClient;
 
+    private ProgressBar loading_map_progress_bar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -145,6 +154,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
         edit_coordinate_button = (ImageButton)findViewById(R.id.editCoordinateButt);
         edit_tracks_button = (ImageButton)findViewById(R.id.editTrackButton);
         add_track_button = (ImageButton)findViewById(R.id.addTrackButt);
+        loading_map_progress_bar = (ProgressBar)findViewById(R.id.loadingMapProgress);
         finish_edit_track_butt = (Button)findViewById(R.id.finishEditTrack);
         save_track = (Button)findViewById(R.id.saveTrack);
         continue_editing = (Button)findViewById(R.id.continueEditTrack);
@@ -180,6 +190,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                 }
             }
         });
+        loading_map_progress_bar.setVisibility(View.VISIBLE);
     }
 
     /*In order to be able to sign out from the logged in account, I have to
@@ -347,7 +358,8 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                                 .include(track_markers.get(track_markers.size()-1).getPosition())
                                 .build();
 
-                        map.easeCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 100);
+                        map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 100);
+
 
                     }
                     @Override
@@ -418,10 +430,13 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                     long logo = (long)point.get("logo");
                     addMarkerForPointOfInterest(latlng, (String)point.get("title"), (String)point.get("snippet"), (int) logo);
                 }
+                loading_map_progress_bar.setVisibility(View.INVISIBLE);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+                loading_map_progress_bar.setVisibility(View.INVISIBLE);
+            }
 
         });
     }
@@ -627,7 +642,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
         public boolean onMarkerClick(@NonNull final Marker marker) {
 
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(marker.getPosition().getLatitude(),
-                    marker.getPosition().getLongitude()), 16));
+                    marker.getPosition().getLongitude()), ZOOM_LEVEL_MARKER_CLICK));
 
             if(DELETE_COORDINATE_MODE){
                 dialogDeleteCoordinate(marker);
@@ -751,7 +766,7 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                 String key = getMarkerHashKey(marker);
                 Intent i = new Intent(EditorPanelActivity.this, EditCoordinateActivity.class);
                 i.putExtra(COORDINATE_KEY, key);
-                startActivity(i);
+                startActivityForResult(i, EDIT_COORDINATE);
             }
         });
         builder.setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
@@ -956,6 +971,150 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
                         Intent i = new Intent(EditorPanelActivity.this, SignInActivity.class);
                         startActivity(i);
                     }});
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        try {
+            super.onActivityResult(requestCode, resultCode, data);
+
+            if(requestCode == NEW_COORDINATE && resultCode == COORDINATE_CREATED){
+                LatLng createdCoordinateLatLng = retreiveLatLngFromJson(data.getStringExtra(CREATED_COORDINATE_FOR_ZOOM));
+
+                String key = hashFunction(createdCoordinateLatLng.getLongitude());
+                updateScreenCoordinates(key, createdCoordinateLatLng, NEW_COORDINATE);
+
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(createdCoordinateLatLng.getLatitude(),
+                                createdCoordinateLatLng.getLongitude()), ZOOM_LEVEL_MARKER_CLICK));
+
+            }
+            if(requestCode == EDIT_COORDINATE && resultCode == COORDINATE_EDITED){
+                LatLng createdCoordinateLatLng = retreiveLatLngFromJson(data.getStringExtra(EDITED_COORDINATE_FOR_ZOOM));
+                String key = hashFunction(createdCoordinateLatLng.getLatitude());
+                updateScreenCoordinates(key, createdCoordinateLatLng, EDIT_COORDINATE);
+
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                        new LatLng(createdCoordinateLatLng.getLongitude(),
+                                createdCoordinateLatLng.getLatitude()), ZOOM_LEVEL_MARKER_CLICK));
+            }
+
+        } catch (Exception ex) {
+            Toast.makeText(EditorPanelActivity.this, ex.toString(),
+                    Toast.LENGTH_SHORT).show();
+        }
+
+
+
+    }
+
+    private void updateScreenCoordinates(final String key, final LatLng createdCoordinate, final int mode) {
+        coordinates.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> coordinatesMap = (Map<String, Object>)dataSnapshot.getValue();
+                if(coordinatesMap == null){
+                    updateScreenPointOfInterestValue(key, createdCoordinate, mode);
+                    return;
+                }
+
+                Map<String, Object> cor = ((Map<String, Object>)coordinatesMap.get(key));
+
+                /*if cor is not null, it means that it is a regular coordinate*/
+                if(cor != null){
+                    if(mode == NEW_COORDINATE){
+                        addMarkerForCoordinate(createdCoordinate,
+                                (String)cor.get("title"), (String)cor.get("snippet"));
+                    }
+                    else if(mode == EDIT_COORDINATE){
+                        List<Marker> markers = map.getMarkers();
+                        for(int i=0; i<markers.size(); i++){
+                            if(markers.get(i).getPosition().getLatitude() == createdCoordinate.getLongitude()
+                                    && markers.get(i).getPosition().getLongitude() == createdCoordinate.getLatitude()){
+
+                                map.removeMarker(markers.get(i));
+                            }
+                            LatLng tempLatLng = new LatLng(createdCoordinate.getLongitude(), createdCoordinate.getLatitude());
+                            addMarkerForCoordinate(tempLatLng,
+                                    (String)cor.get("title"), (String)cor.get("snippet"));
+                        }
+
+                    }
+
+                }
+                /*If cor is null, we know for sure that it's a point of interest and we should
+                * check for it in the other set in database for points*/
+                else{
+                    updateScreenPointOfInterestValue(key, createdCoordinate, mode);
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void updateScreenPointOfInterestValue(final String key, final LatLng createdCoordinate, final int mode) {
+        points_of_interest.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> pointsMap = (Map<String, Object>)dataSnapshot.getValue();
+                if(pointsMap == null)
+                    return;
+
+                if(pointsMap == null){
+                    Toast.makeText(EditorPanelActivity.this, "point is null", Toast.LENGTH_SHORT).show();
+                }
+                Map<String, Object> point = ((Map<String, Object>)pointsMap.get(key));
+
+                long logo = (long)point.get("logo");
+                if(mode == NEW_COORDINATE){
+                    addMarkerForPointOfInterest(createdCoordinate,
+                            (String)point.get("title"), (String)point.get("snippet"),
+                            (int)logo);
+                }
+                else if(mode == EDIT_COORDINATE){
+                    List<Marker> markers = map.getMarkers();
+                    for(int i=0; i<markers.size(); i++){
+                        if(markers.get(i).getPosition().getLatitude() == createdCoordinate.getLongitude()
+                                && markers.get(i).getPosition().getLongitude() == createdCoordinate.getLatitude()){
+
+                            map.removeMarker(markers.get(i));
+                        }
+                        LatLng tempLatLng = new LatLng(createdCoordinate.getLongitude(), createdCoordinate.getLatitude());
+                        addMarkerForPointOfInterest(tempLatLng,
+                                (String)point.get("title"), (String)point.get("snippet"),
+                                (int)logo);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private String hashFunction(double value) {
+        //double latitude = chosenCoordinateLatLng.getLatitude();
+
+        int hash = (int) (10000000*value);
+        return "" + hash;
+    }
+
+    private LatLng retreiveLatLngFromJson(String stringExtra) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        LatLng obj = gson.fromJson(stringExtra, LatLng.class);
+        return obj;
     }
 
     @Override

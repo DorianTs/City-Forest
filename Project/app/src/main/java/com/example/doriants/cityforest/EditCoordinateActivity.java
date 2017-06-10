@@ -25,7 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.doriants.cityforest.Constants.COORDINATE_CREATED;
+import static com.example.doriants.cityforest.Constants.COORDINATE_EDITED;
 import static com.example.doriants.cityforest.Constants.COORDINATE_KEY;
+import static com.example.doriants.cityforest.Constants.EDITED_COORDINATE_FOR_ZOOM;
 
 public class EditCoordinateActivity extends AppCompatActivity {
 
@@ -101,15 +103,25 @@ public class EditCoordinateActivity extends AppCompatActivity {
                 else
                     updateDatabaseForCoordinate();
 
-                Intent i = new Intent(EditCoordinateActivity.this, EditorPanelActivity.class);
-                setResult(COORDINATE_CREATED);
-                startActivity(i);
+                Intent intent = getIntent();
+                intent.putExtra(EDITED_COORDINATE_FOR_ZOOM, castLatLngToJson(coordinateLatLng));
+                setResult(COORDINATE_EDITED, intent);
+                finish();
             }
             // else, go back to last page you came from
             if(v.getId() == cancelButt.getId()){
                 onBackPressed();
             }
         }
+    }
+
+    private String castLatLngToJson(LatLng coordinate) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        String json = gson.toJson(coordinate, LatLng.class);
+        return json;
     }
 
     private void updateDatabaseForCoordinate() {

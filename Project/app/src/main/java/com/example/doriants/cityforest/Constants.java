@@ -14,6 +14,8 @@ public final class Constants {
     public static final String CHOSEN_TRACK = "Chosen Track";
     public static final String TRACK_EDIT = "Track Edit";
     public static final String SELECTED_TRACK = "Selected Track";
+    public static final String CREATED_COORDINATE_FOR_ZOOM = "Created coordinate for zoom";
+    public static final String EDITED_COORDINATE_FOR_ZOOM = "Edited coordinate for zoom";
 
     public static final String SEARCH_RESULT_QUERY = "Search Result query";
     public static final String Q_STARTING_POINT = "Starting point";
@@ -29,6 +31,8 @@ public final class Constants {
 
     public static final int NEW_COORDINATE = 100;
     public static final int COORDINATE_CREATED = 101;
+    public static final int EDIT_COORDINATE = 102;
+    public static final int COORDINATE_EDITED = 103;
     public static final int MAX_NUM_OF_TRACK_COORDINATES = 25;
     public static final int NEW_TRACK = 200;
     public static final int TRACK_CREATED = 201;
@@ -42,6 +46,7 @@ public final class Constants {
 
     public static int ROUTE_LINE_WIDTH = 4;
     public static int ZOOM_LEVEL_CURRENT_LOCATION = 13;
+    public static int ZOOM_LEVEL_MARKER_CLICK = 16;
     public static int RC_SIGN_IN = 1;
 
 }
