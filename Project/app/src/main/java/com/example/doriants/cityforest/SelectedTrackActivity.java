@@ -34,6 +34,7 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -161,6 +162,13 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
                 suitable_for_families_checkbox.setChecked((boolean) track.get("suitable_for_families"));
                 suitable_for_dogs_checkbox.setChecked((boolean) track.get("suitable_for_dogs"));
                 is_romantic_checkbox.setChecked((boolean) track.get("is_romantic"));
+
+                LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                        .include(retrieveLatLngFromJson((String)track.get("starting_point_json_latlng")))
+                        .include(retrieveLatLngFromJson((String)track.get("ending_point_json_latlng")))
+                        .build();
+
+                map.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 200), 100);
             }
 
             @Override
@@ -275,6 +283,15 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
 
         Gson gson = gsonBuilder.create();
         Position obj = gson.fromJson(posJs, Position.class);
+        return obj;
+    }
+
+    public LatLng retrieveLatLngFromJson(String posJs) {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.serializeSpecialFloatingPointValues();
+
+        Gson gson = gsonBuilder.create();
+        LatLng obj = gson.fromJson(posJs, LatLng.class);
         return obj;
     }
 

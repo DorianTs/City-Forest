@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -103,6 +104,8 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
 
     private GoogleApiClient mGoogleApiClient;
 
+    private ProgressBar loading_map_progress_bar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,6 +129,7 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
         finish_edit_track_butt = (Button)findViewById(R.id.finishEditTrack);
         continue_editing = (Button)findViewById(R.id.continueEditTrack);
         counter_coordinates = (TextView)findViewById(R.id.counterCoordinates);
+        loading_map_progress_bar = (ProgressBar)findViewById(R.id.loadingMapProgress);
 
         ClickListener clickListener = new ClickListener();
         add_track_button.setOnClickListener(clickListener);
@@ -146,6 +150,8 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
                 }
             }
         });
+
+        loading_map_progress_bar.setVisibility(View.VISIBLE);
     }
 
     /*In order to be able to sign out from the logged in account, I have to
@@ -403,10 +409,13 @@ public class MakeOwnTrackActivity extends AppCompatActivity implements Permissio
                     long logo = (long)point.get("logo");
                     addMarkerForPointOfInterest(latlng, (String)point.get("title"), (String)point.get("snippet"), (int) logo);
                 }
+                loading_map_progress_bar.setVisibility(View.INVISIBLE);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+                loading_map_progress_bar.setVisibility(View.INVISIBLE);
+            }
 
         });
     }

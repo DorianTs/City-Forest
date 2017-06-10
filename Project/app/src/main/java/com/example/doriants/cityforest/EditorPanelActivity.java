@@ -90,6 +90,8 @@ import static com.example.doriants.cityforest.Constants.MAX_NUM_OF_TRACK_COORDIN
 import static com.example.doriants.cityforest.Constants.NEW_COORDINATE;
 import static com.example.doriants.cityforest.Constants.NEW_TRACK;
 import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
+import static com.example.doriants.cityforest.Constants.TRACK_ENDING_POINT;
+import static com.example.doriants.cityforest.Constants.TRACK_STARTING_POINT;
 import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_CURRENT_LOCATION;
 import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_MARKER_CLICK;
 import static com.mapbox.services.android.telemetry.location.AndroidLocationEngine.getLocationEngine;
@@ -382,6 +384,8 @@ public class EditorPanelActivity extends AppCompatActivity implements Permission
             if(v.getId() == save_track.getId()){
                 Intent i = new Intent(EditorPanelActivity.this, CreateNewTrackActivity.class);
                 i.putExtra(CHOSEN_TRACK, castRouteToJson(currentRoute));
+                i.putExtra(TRACK_STARTING_POINT, castLatLngToJson(track_markers.get(0).getPosition()));
+                i.putExtra(TRACK_ENDING_POINT, castLatLngToJson(track_markers.get(track_markers.size()-1).getPosition()));
                 startActivityForResult(i, NEW_TRACK);
             }
             if(v.getId() == edit_tracks_button.getId()){

@@ -116,7 +116,9 @@ public class EditTrackActivity extends AppCompatActivity {
                         (boolean)track.get("suitable_for_dogs"),
                         (boolean)track.get("suitable_for_families"),
                         (boolean)track.get("is_romantic"),
-                        (String)track.get("additional_info"));
+                        (String)track.get("additional_info"),
+                        (String)track.get("starting_point_json_latlng"),
+                        (String)track.get("ending_point_json_latlng"));
             }
 
             @Override

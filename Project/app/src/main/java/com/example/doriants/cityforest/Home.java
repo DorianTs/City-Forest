@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -70,6 +71,7 @@ public class Home extends AppCompatActivity implements PermissionsListener {
     private PermissionsManager permissionsManager;
 
     private GoogleApiClient mGoogleApiClient;
+    private ProgressBar loading_map_progress_bar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,7 @@ public class Home extends AppCompatActivity implements PermissionsListener {
         advanced_search_butt = (Button)findViewById(R.id.advancedSearchButt);
         make_own_track_butt = (Button)findViewById(R.id.makeOwnTrackButt);
         tracks_list_butt = (Button)findViewById(R.id.tracksButt);
+        loading_map_progress_bar = (ProgressBar)findViewById(R.id.loadingMapProgress);
         advanced_search_butt.setOnClickListener(new ClickListener());
         make_own_track_butt.setOnClickListener(new ClickListener());
         tracks_list_butt.setOnClickListener(new ClickListener());
@@ -105,7 +108,7 @@ public class Home extends AppCompatActivity implements PermissionsListener {
             }
         });
 
-
+        loading_map_progress_bar.setVisibility(View.VISIBLE);
     }
 
     /*In order to be able to sign out from the logged in account, I have to
@@ -173,11 +176,12 @@ public class Home extends AppCompatActivity implements PermissionsListener {
                     DirectionsRoute route = retrieveRouteFromJson(route_st);
                     drawRoute(route);
                 }
+                loading_map_progress_bar.setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                loading_map_progress_bar.setVisibility(View.INVISIBLE);
             }
         });
     }

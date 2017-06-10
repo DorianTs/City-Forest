@@ -304,6 +304,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="@string/cancel_butt"
             tools:ignore="ButtonOrder,ButtonStyle,RtlHardcoded" />
@@ -312,6 +313,8 @@
             android:id="@+id/saveButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:text="@string/save_butt"
             tools:ignore="ButtonStyle" />

@@ -16,6 +16,8 @@ public final class Constants {
     public static final String SELECTED_TRACK = "Selected Track";
     public static final String CREATED_COORDINATE_FOR_ZOOM = "Created coordinate for zoom";
     public static final String EDITED_COORDINATE_FOR_ZOOM = "Edited coordinate for zoom";
+    public static final String TRACK_STARTING_POINT = "Track Starting point";
+    public static final String TRACK_ENDING_POINT = "Track Ending point";
 
     public static final String SEARCH_RESULT_QUERY = "Search Result query";
     public static final String Q_STARTING_POINT = "Starting point";

@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.services.directions.v5.models.DirectionsRoute;
 
 import java.util.HashMap;
@@ -22,6 +23,8 @@ import java.util.Map;
 
 import static com.example.doriants.cityforest.Constants.CHOSEN_TRACK;
 import static com.example.doriants.cityforest.Constants.TRACK_CREATED;
+import static com.example.doriants.cityforest.Constants.TRACK_ENDING_POINT;
+import static com.example.doriants.cityforest.Constants.TRACK_STARTING_POINT;
 
 
 public class CreateNewTrackActivity extends AppCompatActivity {
@@ -43,6 +46,8 @@ public class CreateNewTrackActivity extends AppCompatActivity {
     private CheckBox suitable_for_dogs;
     private CheckBox is_romantic;
     private EditText additional_info;
+    private String starting_point_JsonLatLng;
+    private String ending_point_JsonLatLng;
 
     private Button save_button;
     private Button cancel_button;
@@ -57,6 +62,8 @@ public class CreateNewTrackActivity extends AppCompatActivity {
 
         Intent i = getIntent();
         current_route = retreiveRouteFromJson(i.getStringExtra(CHOSEN_TRACK));
+        starting_point_JsonLatLng = i.getStringExtra(TRACK_STARTING_POINT);
+        ending_point_JsonLatLng = i.getStringExtra(TRACK_ENDING_POINT);
 
         track_name_field = (EditText)findViewById(R.id.trackNameField);
         starting_point = (Spinner)findViewById(R.id.startingPoint);
@@ -80,8 +87,10 @@ public class CreateNewTrackActivity extends AppCompatActivity {
         initiateSpinner(track_level, R.array.track_level);
         initiateSpinner(season, R.array.season);
 
-        duration_field.setText(""+(current_route.getDuration()/3600));
-        distance_field.setText(""+(current_route.getDistance()/1000));
+        double temp_duration = current_route.getDuration()/3600;
+        double temp_distance = current_route.getDistance()/1000;
+        duration_field.setText(""+Math.floor(temp_duration * 100) / 100);
+        distance_field.setText(""+Math.floor(temp_distance * 100) / 100);
 
         save_button.setOnClickListener(new MyClickListener());
         cancel_button.setOnClickListener(new MyClickListener());
@@ -145,6 +154,7 @@ public class CreateNewTrackActivity extends AppCompatActivity {
         return obj;
     }
 
+
     private void writeNewTrack(){
 
         String key = tracks.push().getKey();
@@ -167,7 +177,9 @@ public class CreateNewTrackActivity extends AppCompatActivity {
                 suitable_for_dogs.isChecked(),
                 suitable_for_families.isChecked(),
                 is_romantic.isChecked(),
-                additional_info.getText().toString());
+                additional_info.getText().toString(),
+                starting_point_JsonLatLng,
+                ending_point_JsonLatLng);
 
         /*Converting our track object to a map, that makes
         * the track ready to be entered to the JSON tree*/

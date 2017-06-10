@@ -24,6 +24,8 @@ public class Track {
     private boolean is_romantic;
     private ArrayList<Marker> points_of_interest;
     private String additional_info;
+    private String starting_point_JsonLatLng;
+    private String ending_point_JsonLatLng;
 
     public Track(){
 
@@ -33,7 +35,8 @@ public class Track {
                  String ending_point, double duration, double length, String level,
                  String season, boolean has_water, boolean suitable_for_bikes,
                  boolean suitable_for_dogs, boolean suitable_for_families, boolean is_romantic,
-                 String additional_info){
+                 String additional_info, String starting_point_JsonLatLng,
+                 String ending_point_JsonLatLng){
 
         this.route = route;
         this.db_key = db_key;
@@ -50,6 +53,8 @@ public class Track {
         this.suitable_for_families = suitable_for_families;
         this.is_romantic = is_romantic;
         this.additional_info = additional_info;
+        this.starting_point_JsonLatLng = starting_point_JsonLatLng;
+        this.ending_point_JsonLatLng = ending_point_JsonLatLng;
     }
 
     /*building the JSON branch in the database that will include the track*/
@@ -71,6 +76,8 @@ public class Track {
         result.put("suitable_for_families", this.suitable_for_families);
         result.put("is_romantic", this.is_romantic);
         result.put("additional_info", this.additional_info);
+        result.put("starting_point_json_latlng", this.starting_point_JsonLatLng);
+        result.put("ending_point_json_latlng", this.ending_point_JsonLatLng);
 
         return result;
     }
@@ -122,6 +129,12 @@ public class Track {
     public String getAdditional_info(){
         return additional_info;
     }
+    public String getStarting_point_JsonLatLng(){
+        return this.starting_point_JsonLatLng;
+    }
+    public String getEnding_point_JsonLatLng(){
+        return this.ending_point_JsonLatLng;
+    }
 
     public void setRoute(String route){
         this.route = route;
@@ -167,6 +180,12 @@ public class Track {
     }
     public void setAdditional_info(String additional_info){
         this.additional_info = additional_info;
+    }
+    public void setStarting_point_JsonLatLng(String starting_point_JsonLatLng){
+        this.starting_point_JsonLatLng = starting_point_JsonLatLng;
+    }
+    public void setEnding_point_JsonLatLng(String ending_point_JsonLatLng){
+        this.ending_point_JsonLatLng = ending_point_JsonLatLng;
     }
     
     //========================= END =========================//
