@@ -1,6 +1,8 @@
 package com.example.doriants.cityforest;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Color;
@@ -166,6 +168,27 @@ public class SignInActivity extends AppCompatActivity{
 
         }
 
+    }
+
+    /*Exit app dialog if the user clicked back button*/
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_exit_app_title)
+                .setMessage(R.string.dialog_exit_app_body)
+                .setPositiveButton(R.string.dialog_yes, new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        /*Exits the application*/
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton(R.string.dialog_cancel, null)
+                .show();
     }
 
 }
