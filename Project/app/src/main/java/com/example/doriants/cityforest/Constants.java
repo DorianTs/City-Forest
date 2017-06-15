@@ -49,6 +49,7 @@ public final class Constants {
     public static int ROUTE_LINE_WIDTH = 4;
     public static int ZOOM_LEVEL_CURRENT_LOCATION = 13;
     public static int ZOOM_LEVEL_MARKER_CLICK = 16;
+    public static int ZOOM_LEVEL_LOCATION = 18;
     public static int RC_SIGN_IN = 1;
 
 }

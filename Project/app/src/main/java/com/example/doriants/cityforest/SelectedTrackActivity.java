@@ -53,6 +53,7 @@ import static com.example.doriants.cityforest.Constants.DEFAULT_JERUSALEM_COORDI
 import static com.example.doriants.cityforest.Constants.ROUTE_LINE_WIDTH;
 import static com.example.doriants.cityforest.Constants.SELECTED_TRACK;
 import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_CURRENT_LOCATION;
+import static com.example.doriants.cityforest.Constants.ZOOM_LEVEL_LOCATION;
 import static com.mapbox.services.android.telemetry.location.AndroidLocationEngine.getLocationEngine;
 
 public class SelectedTrackActivity extends AppCompatActivity implements PermissionsListener {
@@ -326,7 +327,7 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
             }
             Location lastLocation = locationEngine.getLastLocation();
             if (lastLocation != null) {
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), 16));
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastLocation), ZOOM_LEVEL_LOCATION));
             }
 
             locationEngineListener = new LocationEngineListener() {
@@ -342,7 +343,7 @@ public class SelectedTrackActivity extends AppCompatActivity implements Permissi
                         // listener so the camera isn't constantly updating when the user location
                         // changes. When the user disables and then enables the location again, this
                         // listener is registered again and will adjust the camera once again.
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 16));
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), ZOOM_LEVEL_LOCATION));
                         locationEngine.removeLocationEngineListener(this);
                     }
                 }
