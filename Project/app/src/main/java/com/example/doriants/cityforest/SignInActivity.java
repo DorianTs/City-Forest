@@ -157,7 +157,8 @@ public class SignInActivity extends AppCompatActivity{
         }
         else{
             String userUid = user.getUid();
-            if(userUid.equals(getResources().getString(R.string.permitted_editor))){
+            if(userUid.equals(getResources().getString(R.string.permitted_editor)) ||
+                    userUid.equals(getResources().getString(R.string.permitted_editor2))){
                 Intent i = new Intent(SignInActivity.this, EditorHomeActivity.class);
                 startActivity(i);
             }
